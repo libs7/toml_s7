@@ -18,7 +18,7 @@ test:show --test_output=all
 test:show --keep_going
 
 common:showdev --config=show
-# common:showdev --//config/profile=dev
+common:showdev --@libs7//config/profile=dev
 common:showdev --compilation_mode=fastbuild
 test:showdev --test_output=all
 test:showdev --keep_going

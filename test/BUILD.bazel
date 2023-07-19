@@ -1,39 +1,34 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
-load("@libs7//:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
-
 load("//:BUILD.bzl",
+     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
+     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS",
      "GOPT_VERSION",
+     "LIBLOG_CC_VERSION",
      "UNITY_VERSION",
      "UTHASH_VERSION")
 
-# load("//test:BUILD.bzl",
-#      "TEST_SRCS", "TEST_DEPS", "TEST_INCLUDE_PATHS",
-#      "TEST_COPTS", "TEST_DEFINES", "TEST_LINKOPTS",
-#      "TIMEOUT")
-
-SRCS          = BASE_SRCS + [  #TEST_SRCS + [
+SRCS          = BASE_SRCS + [
     "common.c", "common.h",
     "@libs7//src:libs7.h"
 ]
 
-INCLUDE_PATHS = BASE_INCLUDE_PATHS + [ # TEST_INCLUDE_PATHS + [
+DEPS          = BASE_DEPS + [
+    "//src:toml_s7",
+    "@gopt//:gopt",
+    "@unity//src:unity",
+    "@uthash//src:uthash",
+]
+INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Isrc",
+    "-Iconfig",
     "-Iexternal/gopt~{}/src".format(GOPT_VERSION),
     "-Iexternal/unity~{}/src".format(UNITY_VERSION),
-    "-Iexternal/uthash~{}/src".format(UTHASH_VERSION)
+    "-Iexternal/uthash~{}/src".format(UTHASH_VERSION),
+    "-Iexternal/liblog_cc~{}/src".format(LIBLOG_CC_VERSION),
 ]
 
 COPTS         = BASE_COPTS + INCLUDE_PATHS
-DEPS          = BASE_DEPS + [
-    "//src:toml_s7",
-    "@libs7//src:s7", # always statically link libs7 for tests???
-    "@gopt//:gopt",
-    "@unity//src:unity",
-    "@uthash//src:uthash"
-]
 DEFINES       = BASE_DEFINES
 LINKOPTS      = BASE_LINKOPTS
 

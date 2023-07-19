@@ -1,33 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
-# exports_files(["libtoml_clibgen.scm"])
-
-load("@libs7//:BUILD.bzl", "BASE_COPTS")
 load("@libs7//lib:BUILD.bzl", "clibgen_runner")
 
 load("//:BUILD.bzl",
-     "BASE_SRCS",
+     "BASE_SRCS", "BASE_DEPS",
+     "BASE_COPTS", "BASE_INCLUDE_PATHS",
+     "BASE_DEFINES", "BASE_LINKOPTS",
+     "LIBS7_VERSION",
      "LIBLOG_CC_VERSION",
-     "TOML_S7_VERSION", "LIBTOML_CC_VERSION",
-     "LIBS7_VERSION")
+     "TOML_S7_VERSION", "LIBTOML_CC_VERSION")
 
-SRCS = BASE_SRCS + ["@libs7//src:s7.h"]
-INCLUDE_PATHS = [
+SRCS = [] # BASE_SRCS + ["@libs7//src:s7.h"]
+INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Iconfig",
     "-Iexternal/toml~{}/config".format(TOML_S7_VERSION),
-    "-Iexternal/libs7~{}/src".format(LIBS7_VERSION),
     "-Iexternal/libtoml_cc~{}/include".format(LIBTOML_CC_VERSION),
-    "-Iexternal/liblog_cc~{}/src".format(LIBLOG_CC_VERSION),
-    # when built within libs7 repo, these are needed:
-    "-Isrc", "-Ilib"
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
-DEPS          = [
-    "@liblog_cc//src:logc",
-    "@libs7//src:s7",
-    # "@libs7//lib:utils",
-    "@libtoml_cc//:toml"
-]
+DEPS          = BASE_DEPS + ["@libtoml_cc//:toml"]
 
 ################################################################
 cc_library(
@@ -68,7 +58,7 @@ cc_library(
     name  = "array",
     linkstatic = True,
     alwayslink = True,
-    srcs  = SRCS + [
+    srcs  = [
         "toml_array_s7.c",
         "libtoml_s7.h",
     ],
@@ -80,7 +70,7 @@ cc_library(
     name  = "datetime",
     linkstatic = True,
     alwayslink = True,
-    srcs  = SRCS + [
+    srcs  = [
         "toml_datetime_s7.c",
         "libtoml_s7.h",
     ],
@@ -92,7 +82,7 @@ cc_library(
     name  = "table",
     linkstatic = True,
     alwayslink = True,
-    srcs  = SRCS + [
+    srcs  = [
         "toml_table_s7.c",
         "libtoml_s7.h",
     ],
