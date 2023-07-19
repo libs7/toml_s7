@@ -1,0 +1,5 @@
+bazel_dep(name = "toml_s7")
+local_path_override(
+    module_name = "toml_s7",
+    path = "..",
+)
