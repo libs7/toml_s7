@@ -417,7 +417,7 @@ s7_pointer libtoml_s7_init(s7_scheme *sc)
   toml_table_t__symbol = s7_make_symbol(sc, "toml_table_t*");
   FILE__symbol = s7_make_symbol(sc, "FILE*");
 
-  s7_define_constant(sc, "toml:version", s7_make_string(sc, "1.0-beta"));
+  s7_define_constant(sc, "*toml:version*", s7_make_string(sc, "1.0-beta"));
 
   /* -------- table ops -------- */
   // TODO: move to toml_table_s7.c

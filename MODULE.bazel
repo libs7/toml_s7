@@ -20,7 +20,7 @@ bazel_dep(name = "rules_cc",  version = RULES_CC_VERSION)
 
 bazel_dep(name = "gopt", version = GOPT_VERSION, dev_dependency=True)
 bazel_dep(name = "uthash", version = UTHASH_VERSION, dev_dependency=True)
-bazel_dep(name = "liblog_cc",  version = LIBLOG_CC_VERSION, dev_dependency=True)
+bazel_dep(name = "liblog_cc",  version = LIBLOG_CC_VERSION)
 bazel_dep(name = "unity",  version = UNITY_VERSION, dev_dependency=True)
 
 bazel_dep(name = "libtoml_cc", version = LIBTOML_CC_VERSION)

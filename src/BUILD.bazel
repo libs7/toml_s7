@@ -7,9 +7,10 @@ load("//:BUILD.bzl",
      "BASE_COPTS", "BASE_INCLUDE_PATHS",
      "BASE_DEFINES", "BASE_LINKOPTS",
      "LIBS7_VERSION",
-     "LIBLOG_CC_VERSION",
+     # "LIBLOG_CC_VERSION",
      "TOML_S7_VERSION", "LIBTOML_CC_VERSION")
 
+DEPS = BASE_DEPS + ["@libtoml_cc//:toml"]
 SRCS = [] # BASE_SRCS + ["@libs7//src:s7.h"]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Iconfig",
@@ -17,7 +18,6 @@ INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Iexternal/libtoml_cc~{}/include".format(LIBTOML_CC_VERSION),
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
-DEPS          = BASE_DEPS + ["@libtoml_cc//:toml"]
 
 ################################################################
 cc_library(
@@ -48,7 +48,7 @@ cc_shared_library(
 
 # clibgen_runner(
 #     name = "libtoml_s7_runbin",
-#     args = ["--script", "lib/libtoml/libtoml_clibgen.scm"],
+#     args = ["--script", "$(location libtoml_clibgen.scm)"],
 #     srcs = [":libtoml_clibgen.scm"],
 #     outs = [":libtoml_s7.c"]
 # )
