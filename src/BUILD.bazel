@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@makeheaders//src:BUILD.bzl", "makeheaders")
+
 load("@libs7//lib:BUILD.bzl", "clibgen_runner")
 
 load("//:BUILD.bzl",
@@ -13,8 +15,8 @@ load("//:BUILD.bzl",
 DEPS = BASE_DEPS + ["@libtoml_cc//:toml"]
 SRCS = [] # BASE_SRCS + ["@libs7//src:s7.h"]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
-    "-Iconfig",
-    "-Iexternal/toml~{}/config".format(TOML_S7_VERSION),
+    "-I$(GENDIR)/src",
+    "-I$(GENDIR)/external/toml~{}/src".format(TOML_S7_VERSION),
     "-Iexternal/libtoml_cc~{}/include".format(LIBTOML_CC_VERSION),
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
@@ -24,11 +26,13 @@ cc_library(
     name  = "toml_s7",
     linkstatic = True,
     alwayslink = True, # ensure init fn sym available for dlsym
-    srcs  = SRCS + ["libtoml_s7.c"],
-    hdrs = ["libtoml_s7.h"],
+    srcs  = SRCS + ["libtoml_s7.c", ":mkhdrs"],
+    hdrs = [":mkhdrs"],
     deps  = DEPS + [
         "@libs7//lib:utils", #FIXME: remove this dep
-        ":table", ":array", ":datetime",
+        ":toml_array",
+        ":toml_datetime",
+        ":toml_table",
     ],
     copts = COPTS + [
         "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
@@ -55,38 +59,57 @@ cc_shared_library(
 
 ################################################################
 cc_library(
-    name  = "array",
+    name  = "toml_array",
     linkstatic = True,
     alwayslink = True,
     srcs  = [
         "toml_array_s7.c",
-        "libtoml_s7.h",
+        ":mkhdrs",
     ],
     deps  = DEPS,
     copts = COPTS,
 )
 
 cc_library(
-    name  = "datetime",
+    name  = "toml_datetime",
     linkstatic = True,
     alwayslink = True,
     srcs  = [
         "toml_datetime_s7.c",
-        "libtoml_s7.h",
+        ":mkhdrs",
     ],
     deps  = DEPS,
     copts = COPTS,
 )
 
 cc_library(
-    name  = "table",
+    name  = "toml_table",
     linkstatic = True,
     alwayslink = True,
     srcs  = [
         "toml_table_s7.c",
-        "libtoml_s7.h",
+        ":mkhdrs"
     ],
     deps  = DEPS,
     copts = COPTS,
 )
 
+################################################################
+makeheaders(
+    name = "mkhdrs",
+    srcs = [
+        "libtoml_s7.c",
+        "toml_array_s7.c",
+        "toml_datetime_s7.c",
+        "toml_table_s7.c"
+    ],
+    additional_srcs = select({
+        "//config/profile:dev?": [
+            ":ansi_colors.h",
+            ":trace_dev.h"
+        ],
+        "//conditions:default": [
+            ":trace_prod.h"
+        ]
+    })
+)

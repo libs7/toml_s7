@@ -1,15 +1,11 @@
+common --symlink_prefix=.bazel/
 common --experimental_cc_shared_library
-
 common --enable_bzlmod
 
+## use this to add a local registry:
+try-import .config/registries.bazelrc
 common --registry=https://raw.githubusercontent.com/obazl/registry/main/
 common --registry=https://bcr.bazel.build
-
-common --symlink_prefix=.bazel/
-
-# build --experimental_cc_shared_library
-# run   --experimental_cc_shared_library
-# test  --experimental_cc_shared_library
 
 common --color=yes
 common:show --subcommands=pretty_print
@@ -18,7 +14,7 @@ test:show --test_output=all
 test:show --keep_going
 
 common:showdev --config=show
-common:showdev --@libs7//config/profile=dev
+common:showdev --//config/profile=dev
 common:showdev --compilation_mode=fastbuild
 test:showdev --test_output=all
 test:showdev --keep_going

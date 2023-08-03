@@ -3,10 +3,14 @@
 #include <string.h>
 
 #include "utils.h"
-#include "toml.h"
+/* #include "toml.h" */
+
+#if INTERFACE
+#include "libs7.h"
+#include "tomlx.h"
+#endif
+
 #include "libtoml_s7.h"
-/* #include "toml_table_s7.h" */
-/* #include "toml_array_s7.h" */
 
 s7_pointer c_pointer_string, string_string, character_string, boolean_string, real_string, complex_string;
 s7_pointer integer_string;
@@ -18,7 +22,7 @@ static s7_pointer int64_t__symbol, toml_datum_t__symbol, toml_array_t__symbol, t
  */
 static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_read);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     /* TRACE_S7_DUMP("args", args); */
 
@@ -72,7 +76,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
 /* s7_pointer toml_read_file(s7_scheme *sc, s7_pointer args) */
 s7_pointer toml_read_file(s7_scheme *s7, char *fname)
 {
-    TRACE_ENTRY(toml_read_file);
+    TRACE_ENTRY;
     log_debug("toml file: %s", fname);
     (void)fname;
     /* toml_parse_file(FILE *fp, char *errbuf, int errbufsz); */
@@ -248,7 +252,7 @@ static s7_pointer toml_toml_array_key(s7_scheme *sc, s7_pointer args)
 // only counts items with atomic vals (not arrays or tables)
 static s7_pointer toml_toml_table_nkval(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_toml_table_nkval);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -288,7 +292,7 @@ static s7_pointer toml_toml_table_narr(s7_scheme *sc, s7_pointer args)
 /* -------- toml_table_ntab -------- */
 static s7_pointer toml_toml_table_ntab(s7_scheme *sc, s7_pointer args)
 {
-    TRACE_ENTRY(toml_toml_table_ntab);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -312,7 +316,7 @@ static s7_pointer toml_toml_table_ntab(s7_scheme *sc, s7_pointer args)
 /* returns key of table */
 static s7_pointer toml_toml_table_key(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_toml_table_key);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -371,7 +375,7 @@ s7_pointer pl_tx, pl_xx, pl_xxs,pl_sx, pl_sxi, pl_ix, pl_iis, pl_isix, pl_bxs;
 s7_pointer libtoml_s7_init(s7_scheme *sc);
 s7_pointer libtoml_s7_init(s7_scheme *sc)
 {
-    TRACE_ENTRY(libtoml_s7_init);
+    TRACE_ENTRY;
   s7_pointer cur_env;
   /* s7_pointer pl_tx, pl_xxs,pl_sx, pl_sxi, pl_ix, pl_iis, pl_isix, pl_bxs; */
   //  pl_xxsi, pl_ixs

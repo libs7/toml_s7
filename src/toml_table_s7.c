@@ -2,13 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libtoml_s7.h"
-/* #include "toml_table_s7.h" */
-/* #include "toml_array_s7.h" */
+#if INTERFACE
+#include "libs7.h"
+#include "tomlx.h"
+#endif
+
+#include "toml_table_s7.h"
 
 int toml_table_type_tag = 0;
 
 s7_pointer string_string;
+
+extern s7_pointer pl_xx, pl_xxs;
 
 /*
  * TODO:
@@ -31,7 +36,7 @@ s7_pointer string_string;
 static s7_pointer free_toml_table(s7_scheme *s7, s7_pointer obj)
 {
     (void)s7;
-    TRACE_ENTRY(free_toml_table);
+    TRACE_ENTRY;
     toml_free(s7_c_object_value(obj));
     return(NULL);
 }
@@ -47,7 +52,7 @@ static s7_pointer mark_toml_table(s7_scheme *s7, s7_pointer obj)
 
 /* static */ s7_pointer is_toml_table(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(is_toml_table);
+    TRACE_ENTRY;
     return(s7_make_boolean(s7,
               s7_is_c_object(s7_car(args)) &&
               s7_c_object_type(s7_car(args)) == toml_table_type_tag));
@@ -56,21 +61,21 @@ static s7_pointer mark_toml_table(s7_scheme *s7, s7_pointer obj)
 static s7_pointer toml_table_is_equal(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_is_equal);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_table_is_equivalent(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_is_equivalent);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 /* returns list */
 s7_pointer toml_table_keys(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_table_keys);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -97,7 +102,7 @@ s7_pointer toml_table_keys(s7_scheme *s7, s7_pointer args)
 /* returns list */
 s7_pointer toml_table_values(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_table_vals);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -125,7 +130,7 @@ s7_pointer toml_table_values(s7_scheme *s7, s7_pointer args)
 // FIXME: call tomlx_table_ref
 s7_pointer g_toml_table_ref(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_table_ref);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     char* key;
     p = args;
@@ -218,14 +223,14 @@ s7_pointer g_toml_table_ref(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_table_set(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 s7_pointer g_toml_table_length(s7_scheme *s7, s7_pointer args)
 {
     //FIXME: call tomlx_table_length(t);
-    TRACE_ENTRY(g_toml_table_length);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -249,27 +254,27 @@ s7_pointer g_toml_table_length(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_table_copy(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_table_fill(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_table_reverse(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_table_to_hash_table(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_table_to_hash_table);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -284,7 +289,7 @@ static s7_pointer g_toml_table_to_hash_table(s7_scheme *s7, s7_pointer args)
  __attribute__((__unused__)) static s7_pointer g_toml_table_to_alist(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_table_to_alist);
+    TRACE_ENTRY;
     return s7_f(s7);
     return s7_list(s7, 3,
                    s7_make_symbol(s7, "toml-table"),
@@ -294,7 +299,7 @@ static s7_pointer g_toml_table_to_hash_table(s7_scheme *s7, s7_pointer args)
 
 /* static s7_pointer toml_table_to_list(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(toml_table_to_list); */
+/*     TRACE_ENTRY; */
 /*     return s7_f(s7); */
 /*     return s7_list(s7, 3, */
 /*                    s7_make_symbol(s7, "toml-table"), */
@@ -304,7 +309,7 @@ static s7_pointer g_toml_table_to_hash_table(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer g_toml_table_to_string(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_table_to_string);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -336,20 +341,20 @@ static s7_pointer g_toml_table_to_string(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_table_getter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_getter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_table_setter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_table_setter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 void toml_table_init(s7_scheme *s7, s7_pointer cur_env)
 {
-    TRACE_ENTRY(toml_table_init);
+    TRACE_ENTRY;
     toml_table_type_tag = s7_make_c_type(s7, "toml_table");
     /* TRACE_LOG_DEBUG("toml_table_type_tag: %d", toml_table_type_tag); */
 
@@ -404,7 +409,7 @@ void toml_table_init(s7_scheme *s7, s7_pointer cur_env)
 /* WARNING WARNING: we convert keys to s7 keywords */
 s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
 {
-    TRACE_ENTRY(toml_table_to_hash_table);
+    TRACE_ENTRY;
     toml_datum_t datum;
     int typ;
 

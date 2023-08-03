@@ -2,8 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libtoml_s7.h"
-/* #include "toml_array_s7.h" */
+#if INTERFACE
+#include "libs7.h"
+#include "tomlx.h"
+#endif
+
+#include "toml_datetime_s7.h"
 
 int toml_datetime_type_tag = 0;
 
@@ -35,7 +39,7 @@ s7_pointer toml_datetime_to_alist(s7_scheme *s7, toml_timestamp_t *ts, bool clon
 // (toml:date-year ts)
 static s7_pointer toml_date_year(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_date_year);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -54,7 +58,7 @@ static s7_pointer toml_date_year(s7_scheme *s7, s7_pointer args)
 // (toml:date-month ts)
 static s7_pointer toml_date_month(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_date_month);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -73,7 +77,7 @@ static s7_pointer toml_date_month(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_free_toml_datetime(s7_scheme *s7, s7_pointer obj)
 {
     (void)s7;
-    TRACE_ENTRY(g_free_toml_datetime);
+    TRACE_ENTRY;
     free(s7_c_object_value(obj));
     return(NULL);
 }
@@ -82,7 +86,7 @@ static s7_pointer g_mark_toml_datetime(s7_scheme *s7, s7_pointer args)
 {
     (void)s7;
     (void)args;
-    TRACE_ENTRY(g_mark_toml_datetime);
+    TRACE_ENTRY;
     /* toml_datetime_t *t = (toml_datetime_t*)s7_c_object_value(obj); */
     /* s7_mark(o->data); */
     return(NULL);
@@ -90,7 +94,7 @@ static s7_pointer g_mark_toml_datetime(s7_scheme *s7, s7_pointer args)
 
 s7_pointer g_is_toml_datetime(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_is_toml_datetime);
+    TRACE_ENTRY;
     return(s7_make_boolean(s7,
                            s7_is_c_object(s7_car(args)) &&
                            s7_c_object_type(s7_car(args)) == toml_datetime_type_tag));
@@ -99,20 +103,20 @@ s7_pointer g_is_toml_datetime(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_is_equal(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_is_equal);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_datetime_is_equivalent(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_is_equivalent);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_datetime_ref(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_datetime_ref);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -168,21 +172,21 @@ static s7_pointer g_toml_datetime_ref(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_set(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_datetime_length(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_length);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_datetime_copy(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_set);
+    TRACE_ENTRY;
     // UNSUPPORTED
     return s7_nil(s7);
 }
@@ -190,7 +194,7 @@ static s7_pointer g_toml_datetime_copy(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_fill(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_fill);
+    TRACE_ENTRY;
     // UNSUPPORTED
     return s7_nil(s7);
 }
@@ -198,7 +202,7 @@ static s7_pointer g_toml_datetime_fill(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_reverse(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_reverse);
+    TRACE_ENTRY;
     // UNSUPPORTED
     return s7_nil(s7);
 }
@@ -206,7 +210,7 @@ static s7_pointer g_toml_datetime_reverse(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_to_list(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_to_list);
+    TRACE_ENTRY;
     /* s7_pointer p, arg; */
     /* p = args; */
     /* arg = s7_car(p); */
@@ -219,7 +223,7 @@ static s7_pointer g_toml_datetime_to_list(s7_scheme *s7, s7_pointer args)
 // FIXME: conversion to srfi-19 struct?
 static s7_pointer g_toml_datetime_to_alist(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_datetime_to_list);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -233,7 +237,7 @@ static s7_pointer g_toml_datetime_to_alist(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer g_toml_datetime_to_hash_table(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_datetime_to_vector);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -245,7 +249,7 @@ static s7_pointer g_toml_datetime_to_hash_table(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_datetime_to_string);
+    TRACE_ENTRY;
     TRACE_LOG_DEBUG("arg ct: %d", s7_list_length(s7, args));
     s7_pointer p, arg;
     p = args;
@@ -276,19 +280,19 @@ static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_getter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_toml_datetime_getter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 /* static s7_pointer toml_datetime_setter(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(toml_datetime_setter); */
+/*     TRACE_ENTRY; */
 /*     return s7_nil(s7); */
 /* } */
 
 void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 {
-    TRACE_ENTRY(toml_datetime_init);
+    TRACE_ENTRY;
     toml_datetime_type_tag = s7_make_c_type(s7, "toml_datetime");
     /* TRACE_LOG_DEBUG("toml_datetime_type_tag: %d", toml_datetime_type_tag); */
 
@@ -363,7 +367,7 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
  */
 /* char *tomlx_datetime_to_string(toml_timestamp_t *ts, bool use_write) */
 /* { */
-/*     TRACE_ENTRY(tomlx_datetime_to_string); */
+/*     TRACE_ENTRY; */
 /*     TRACE_LOG_DEBUG("use_write: %d", use_write); */
 /*     const int BUFSZ = 4096; */
 /*     char *buf;          /\* WARNING: malloc *\/ */
@@ -453,7 +457,7 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 s7_pointer toml_datetime_to_alist(s7_scheme *s7, toml_timestamp_t *ts, bool clone)
 {
     (void)clone;
-    TRACE_ENTRY(toml_datetime_to_alist);
+    TRACE_ENTRY;
 
     s7_pointer the_alist = s7_make_list(s7, (s7_int)8, s7_nil(s7));
     s7_pointer year = s7_cons(s7,
@@ -466,7 +470,7 @@ s7_pointer toml_datetime_to_alist(s7_scheme *s7, toml_timestamp_t *ts, bool clon
 
 s7_pointer toml_datetime_to_hash_table(s7_scheme *s7, toml_timestamp_t *ts)
 {
-    TRACE_ENTRY(toml_datetime_to_hash_table);
+    TRACE_ENTRY;
 
     s7_pointer ht = s7_make_hash_table(s7, 8);
     s7_hash_table_set(s7, ht, s7_make_keyword(s7, "year"),

@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libtoml_s7.h"
-/* #include "toml_array_s7.h" */
-
+#if INTERFACE
+#include "libs7.h"
 #include "tomlx.h"
+#endif
+
+#include "toml_array_s7.h"
 
 int toml_array_type_tag = 0;
 
@@ -19,7 +21,7 @@ int toml_array_type_tag = 0;
 /* **************************************************************** */
 static s7_pointer free_toml_array(s7_scheme *s7, s7_pointer obj)
 {
-    TRACE_ENTRY(free_toml_array);
+    TRACE_ENTRY;
     (void)s7;
     free(s7_c_object_value(obj));
     return(NULL);
@@ -36,7 +38,7 @@ static s7_pointer mark_toml_array(s7_scheme *s7, s7_pointer obj)
 
 /* static */ s7_pointer is_toml_array(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(is_toml_array);
+    TRACE_ENTRY;
     /* TRACE_LOG_DEBUG("c obj?: %d", s7_is_c_object(s7_car(args))); */
     /* TRACE_LOG_DEBUG("c obj typ: %d", s7_c_object_type(s7_car(args))); */
     /* TRACE_LOG_DEBUG("toml-array typ: %d", toml_array_type_tag); */
@@ -48,21 +50,21 @@ static s7_pointer mark_toml_array(s7_scheme *s7, s7_pointer obj)
 static s7_pointer toml_array_is_equal(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_is_equal);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_array_is_equivalent(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_is_equivalent);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 /* -------- toml_array_ref -------- */
 s7_pointer toml_array_ref(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_toml_array_ref);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     int idx;
     p = args;
@@ -134,14 +136,14 @@ s7_pointer toml_array_ref(s7_scheme *s7, s7_pointer args)
 
 /* static s7_pointer toml_array_ref(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(toml_array_ref); */
+/*     TRACE_ENTRY; */
 /*     return s7_nil(s7); */
 /* } */
 
 static s7_pointer toml_array_set(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
@@ -149,7 +151,7 @@ static s7_pointer toml_array_set(s7_scheme *s7, s7_pointer args)
 /* s7_pointer toml_toml_array_nelem(s7_scheme *sc, s7_pointer args) */
 s7_pointer toml_array_length(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_array_length);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -166,7 +168,7 @@ s7_pointer toml_array_length(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer toml_array_copy(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(toml_array_set);
+    TRACE_ENTRY;
     (void)args;
     // UNSUPPORTED
     return s7_nil(s7);
@@ -175,7 +177,7 @@ static s7_pointer toml_array_copy(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_array_fill(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_set);
+    TRACE_ENTRY;
     // UNSUPPORTED
     return s7_nil(s7);
 }
@@ -183,13 +185,13 @@ static s7_pointer toml_array_fill(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_array_reverse(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer g_toml_array_to_list(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_array_to_list);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -203,7 +205,7 @@ static s7_pointer g_toml_array_to_list(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer g_toml_array_to_vector(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_array_to_vector);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -216,7 +218,7 @@ static s7_pointer g_toml_array_to_vector(s7_scheme *s7, s7_pointer args)
 
 static s7_pointer g_toml_array_to_string(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_toml_array_to_string);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -245,20 +247,20 @@ static s7_pointer g_toml_array_to_string(s7_scheme *s7, s7_pointer args)
 static s7_pointer toml_array_getter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_getter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer toml_array_setter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(toml_array_setter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 void toml_array_init(s7_scheme *s7, s7_pointer cur_env)
 {
-    TRACE_ENTRY(toml_array_init);
+    TRACE_ENTRY;
     toml_array_type_tag = s7_make_c_type(s7, "toml_array");
     /* TRACE_LOG_DEBUG("toml_array_type_tag: %d", toml_array_type_tag); */
 
@@ -319,7 +321,7 @@ void toml_array_init(s7_scheme *s7, s7_pointer cur_env)
  */
 /* static toml_datum_t tomlx_array_datum_for_idx(toml_array_t *ta, int idx, int *typ) */
 /* { */
-/*     TRACE_ENTRY(tomlx_array_datum_for_idx); */
+/*     TRACE_ENTRY; */
 /*     toml_datum_t datum; */
 
 /*     datum = toml_string_at(ta, idx); */
@@ -364,7 +366,7 @@ void toml_array_init(s7_scheme *s7, s7_pointer cur_env)
 
 /* static void *tomlx_array_seq_for_idx(toml_array_t *ta, int idx, int *typ) */
 /* { */
-/*     TRACE_ENTRY(tomlx_array_seq_for_idx); */
+/*     TRACE_ENTRY; */
 
 /*     toml_array_t *a = toml_array_at(ta, idx); */
 /*     if (a) { */
@@ -388,7 +390,7 @@ void toml_array_init(s7_scheme *s7, s7_pointer cur_env)
 
 /* char *tomlx_array_to_string(toml_array_t *ta, bool use_write) */
 /* { */
-/*     TRACE_ENTRY(tomlx_array_to_string); */
+/*     TRACE_ENTRY; */
 /*     toml_datum_t datum; */
 /*     int typ; */
 
@@ -651,7 +653,7 @@ void toml_array_init(s7_scheme *s7, s7_pointer cur_env)
 
 s7_pointer toml_array_to_list(s7_scheme *s7, toml_array_t *ta, bool clone)
 {
-    TRACE_ENTRY(toml_array_to_list);
+    TRACE_ENTRY;
 
     /* s7_pointer the_list = s7_nil(s7); */
 
@@ -727,7 +729,7 @@ s7_pointer toml_array_to_list(s7_scheme *s7, toml_array_t *ta, bool clone)
 
 s7_pointer toml_array_to_vector(s7_scheme *s7, toml_array_t *ta, bool clone)
 {
-    TRACE_ENTRY(toml_array_to_vector);
+    TRACE_ENTRY;
 
     /* s7_pointer the_list = s7_nil(s7); */
 
