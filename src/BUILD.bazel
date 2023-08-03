@@ -16,7 +16,7 @@ DEPS = BASE_DEPS + ["@libtoml_cc//:toml"]
 SRCS = [] # BASE_SRCS + ["@libs7//src:s7.h"]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-I$(GENDIR)/src",
-    "-I$(GENDIR)/external/toml~{}/src".format(TOML_S7_VERSION),
+    "-I$(GENDIR)/external/toml_s7~{}/src".format(TOML_S7_VERSION),
     "-Iexternal/libtoml_cc~{}/include".format(LIBTOML_CC_VERSION),
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
