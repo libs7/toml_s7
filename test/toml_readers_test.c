@@ -1,7 +1,10 @@
-#include "config.h"
+#include "log.h"
 #include "unity.h"
-#include "common.h"
+
 #include "libs7.h"
+
+#include "clibtest_config.h"
+#include "macros.h"
 
 s7_scheme *s7;
 

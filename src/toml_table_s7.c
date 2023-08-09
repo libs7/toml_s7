@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
+
 #if INTERFACE
 #include "libs7.h"
 #include "tomlx.h"

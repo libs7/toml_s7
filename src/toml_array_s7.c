@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
+
 #if INTERFACE
 #include "libs7.h"
 #include "tomlx.h"
@@ -10,6 +12,8 @@
 #include "toml_array_s7.h"
 
 int toml_array_type_tag = 0;
+
+s7_pointer integer_string;
 
 /*
  * OPS: vector?, vector-length, vector-ref

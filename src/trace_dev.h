@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #define TRACE_ENTRY log_trace(RED "ENTRY:" CRESET " %s", __func__);
 #define TRACE_EXIT log_trace(RED "EXIT:" CRESET " %s", __func__);
 #define TRACE_ENTRY_STR(fn, str) \

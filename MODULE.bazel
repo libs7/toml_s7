@@ -3,7 +3,7 @@ TOML_S7_VERSION = "0.1.0"
 LIBTOML_CC_VERSION = "0.1.0"
 
 GOPT_VERSION = "10.0.0"
-LIBLOG_CC_VERSION = "1.0.0"
+LIBLOGC_VERSION = "1.0.0"
 MAKEHEADERS_VERSION = "1.0.0"
 PLATFORMS_VERSION = "0.0.6"
 RULES_CC_VERSION = "0.0.6"
@@ -22,9 +22,12 @@ bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "rules_cc",  version = RULES_CC_VERSION)
 bazel_dep(name = "makeheaders", version = MAKEHEADERS_VERSION)
 
+S7_TOOLS_VERSION = "1.0.0"
+bazel_dep(name = "s7_tools", version = S7_TOOLS_VERSION, dev_dependency=True)
+
 bazel_dep(name = "gopt", version = GOPT_VERSION, dev_dependency=True)
 bazel_dep(name = "uthash", version = UTHASH_VERSION, dev_dependency=True)
-bazel_dep(name = "liblog_cc",  version = LIBLOG_CC_VERSION)
+bazel_dep(name = "liblogc",  version = LIBLOGC_VERSION)
 bazel_dep(name = "unity",  version = UNITY_VERSION, dev_dependency=True)
 
 bazel_dep(name = "libtoml_cc", version = LIBTOML_CC_VERSION)

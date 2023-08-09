@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utils.h"
+#include "log.h"
+
+/* #include "utils.h" */
 /* #include "toml.h" */
 
 #if INTERFACE
@@ -31,15 +33,29 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
     const char* toml_str = NULL;
     /* log_debug("toml_str ptr: %p", (void*)toml_str); */
 
+    /* use s7 length to get length in bytes of port's
+       file or string */
+    s7_pointer s7_length = s7_name_to_value(s7, "length");
+    s7_pointer s7_read_string = s7_name_to_value(s7, "read-string");
     p = args;
     if (p == s7_nil(s7)) {
         /* log_debug("SOURCE: current-input-port"); */
-        toml_str = libs7_input_port_to_c_string(s7, s7_current_input_port(s7));
+        s7_pointer p = s7_current_input_port(s7);
+        s7_pointer len = s7_call(s7, s7_length, s7_list(s7, 1, p));
+        s7_pointer ts = s7_call(s7, s7_read_string,
+                                s7_list(s7, 2, len, p));
+        toml_str = s7_string(ts);
+        /* toml_str = libs7_input_port_to_c_string(s7, s7_current_input_port(s7)); */
     } else {
         arg = s7_car(p);
         if (s7_is_input_port(s7, arg)) {
             TRACE_LOG_DEBUG("SOURCE: input port", "");
-            toml_str = libs7_input_port_to_c_string(s7, arg);
+            s7_pointer len = s7_call(s7, s7_length,
+                                     s7_list(s7, 1, arg));
+            s7_pointer ts = s7_call(s7, s7_read_string,
+                                    s7_list(s7, 2, len, arg));
+            toml_str = s7_string(ts);
+            /* toml_str = libs7_input_port_to_c_string(s7, arg); */
         }
         else if (s7_is_string(arg)) {
             TRACE_LOG_DEBUG("SOURCE: string", "");
@@ -74,7 +90,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
 
 /* -------- toml_read_file -------- */
 /* s7_pointer toml_read_file(s7_scheme *sc, s7_pointer args) */
-s7_pointer toml_read_file(s7_scheme *s7, char *fname)
+EXPORT s7_pointer toml_read_file(s7_scheme *s7, char *fname)
 {
     TRACE_ENTRY;
     log_debug("toml file: %s", fname);
@@ -372,8 +388,8 @@ static s7_pointer toml_toml_ucs_to_utf8(s7_scheme *sc, s7_pointer args)
 
 s7_pointer pl_tx, pl_xx, pl_xxs,pl_sx, pl_sxi, pl_ix, pl_iis, pl_isix, pl_bxs;
 
-s7_pointer libtoml_s7_init(s7_scheme *sc);
-s7_pointer libtoml_s7_init(s7_scheme *sc)
+//s7_pointer libtoml_s7_init(s7_scheme *sc);
+EXPORT s7_pointer libtoml_s7_init(s7_scheme *sc)
 {
     TRACE_ENTRY;
   s7_pointer cur_env;

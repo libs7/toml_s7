@@ -1,19 +1,18 @@
-package(default_visibility = ["//visibility:public"])
+load("@s7_tools//src:RULES.bzl", "clibgen")
+load("@makeheaders//src:RULES.bzl", "makeheaders")
 
-load("@makeheaders//src:BUILD.bzl", "makeheaders")
-
-load("@libs7//lib:BUILD.bzl", "clibgen_runner")
-
-load("//:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS",
-     "BASE_COPTS", "BASE_INCLUDE_PATHS",
-     "BASE_DEFINES", "BASE_LINKOPTS",
+load("//:MODULE.bzl",
      "LIBS7_VERSION",
-     # "LIBLOG_CC_VERSION",
+     # "LIBLOGC_VERSION",
      "TOML_S7_VERSION", "LIBTOML_CC_VERSION")
 
+load("//config/cc:BUILD.bzl",
+     "BASE_SRCS", "BASE_DEPS",
+     "BASE_COPTS", "BASE_INCLUDE_PATHS",
+     "BASE_DEFINES", "BASE_LINKOPTS")
+
 DEPS = BASE_DEPS + ["@libtoml_cc//:toml"]
-SRCS = [] # BASE_SRCS + ["@libs7//src:s7.h"]
+SRCS = BASE_SRCS
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-I$(GENDIR)/src",
     "-I$(GENDIR)/external/toml_s7~{}/src".format(TOML_S7_VERSION),
@@ -21,22 +20,25 @@ INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
 
+exports_files(["trace_dev.h"]) # for testing
+
 ################################################################
 cc_library(
     name  = "toml_s7",
     linkstatic = True,
     alwayslink = True, # ensure init fn sym available for dlsym
     srcs  = SRCS + ["libtoml_s7.c", ":mkhdrs"],
-    hdrs = [":mkhdrs"],
+    hdrs = [":toml_s7.h"],
     deps  = DEPS + [
-        "@libs7//lib:utils", #FIXME: remove this dep
+        # "@libs7//lib:utils", #FIXME: remove this dep
         ":toml_array",
         ":toml_datetime",
         ":toml_table",
     ],
     copts = COPTS + [
-        "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
+        # "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
     ],
+    visibility = ["//visibility:public"]
 )
 
 cc_shared_library(
@@ -47,11 +49,12 @@ cc_shared_library(
         # "@platforms//os:windows": "libtoml_s7.dll",
         "//conditions:default": "libtoml_s7.so"
     }),
-    deps = [":toml_s7"]
+    deps = [":toml_s7"],
+    visibility = ["//visibility:public"]
 )
 
-# clibgen_runner(
-#     name = "libtoml_s7_runbin",
+# clibgen(
+#     name = "plugin",
 #     args = ["--script", "$(location libtoml_clibgen.scm)"],
 #     srcs = [":libtoml_clibgen.scm"],
 #     outs = [":libtoml_s7.c"]
@@ -62,7 +65,7 @@ cc_library(
     name  = "toml_array",
     linkstatic = True,
     alwayslink = True,
-    srcs  = [
+    srcs  = SRCS + [
         "toml_array_s7.c",
         ":mkhdrs",
     ],
@@ -97,7 +100,28 @@ cc_library(
 ################################################################
 makeheaders(
     name = "mkhdrs",
-    srcs = [
+    hdrs_srcs = [
+        "libtoml_s7.c",
+        "toml_array_s7.c",
+        "toml_datetime_s7.c",
+        "toml_table_s7.c"
+    ],
+    additional_srcs = select({
+        "//config/profile:dev?": [
+            ":ansi_colors.h",
+            ":trace_dev.h"
+        ],
+        "//conditions:default": [
+            ":trace_prod.h"
+        ]
+    })
+)
+
+makeheaders(
+    name = "export_hdr",
+    out  = "toml_s7.h",
+    export_interface = True,
+    hdrs_srcs = [
         "libtoml_s7.c",
         "toml_array_s7.c",
         "toml_datetime_s7.c",

@@ -1,19 +1,24 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
-load("//:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS",
+load("//:MODULE.bzl",
      "GOPT_VERSION",
-     "LIBLOG_CC_VERSION",
+     "LIBLOGC_VERSION",
+     "S7_TOOLS_VERSION",
      "UNITY_VERSION",
      "UTHASH_VERSION")
 
+load("//config/cc:BUILD.bzl",
+     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
+     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
+
 SRCS          = BASE_SRCS + [
-    "common.c", "common.h",
-    "@libs7//src:libs7.h"
+    "//src:trace_dev.h",
+    "macros.h"
+    # "common.c", "common.h",
 ]
 
 DEPS          = BASE_DEPS + [
+    "@s7_tools//src:clibtest_config",
     "//src:toml_s7",
     "@gopt//:gopt",
     "@unity//src:unity",
@@ -25,10 +30,13 @@ INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Iexternal/gopt~{}/src".format(GOPT_VERSION),
     "-Iexternal/unity~{}/src".format(UNITY_VERSION),
     "-Iexternal/uthash~{}/src".format(UTHASH_VERSION),
-    "-Iexternal/liblog_cc~{}/src".format(LIBLOG_CC_VERSION),
+    "-Iexternal/liblogc~{}/src".format(LIBLOGC_VERSION),
+    "-I$(GENDIR)/external/s7_tools~{}/src".format(S7_TOOLS_VERSION),
 ]
 
-COPTS         = BASE_COPTS + INCLUDE_PATHS
+COPTS         = BASE_COPTS + INCLUDE_PATHS + [
+    "-Wno-gnu-statement-expression"
+]
 DEFINES       = BASE_DEFINES
 LINKOPTS      = BASE_LINKOPTS
 
