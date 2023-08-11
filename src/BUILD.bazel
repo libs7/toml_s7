@@ -1,43 +1,34 @@
-load("@s7_tools//src:RULES.bzl", "clibgen")
 load("@makeheaders//src:RULES.bzl", "makeheaders")
-
-load("//:MODULE.bzl",
-     "LIBS7_VERSION",
-     # "LIBLOGC_VERSION",
-     "TOML_S7_VERSION", "LIBTOML_CC_VERSION")
 
 load("//config/cc:BUILD.bzl",
      "BASE_SRCS", "BASE_DEPS",
      "BASE_COPTS", "BASE_INCLUDE_PATHS",
      "BASE_DEFINES", "BASE_LINKOPTS")
 
-DEPS = BASE_DEPS + ["@libtoml_cc//:toml"]
 SRCS = BASE_SRCS
+DEPS = BASE_DEPS + ["@tomlc//src:tomlc"]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
-    "-I$(GENDIR)/src",
-    "-I$(GENDIR)/external/toml_s7~{}/src".format(TOML_S7_VERSION),
-    "-Iexternal/libtoml_cc~{}/include".format(LIBTOML_CC_VERSION),
+    "-I$(@tomlc)/src",
+    "-I$(GENDIR)/$(@)/src"
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
-
+TOOLCHAINS = ["//:repo_paths"]
 exports_files(["trace_dev.h"]) # for testing
 
 ################################################################
 cc_library(
-    name  = "toml_s7",
+    name       = "toml_s7",
     linkstatic = True,
-    alwayslink = True, # ensure init fn sym available for dlsym
-    srcs  = SRCS + ["libtoml_s7.c", ":mkhdrs"],
-    hdrs = [":toml_s7.h"],
-    deps  = DEPS + [
-        # "@libs7//lib:utils", #FIXME: remove this dep
+    alwayslink = True,
+    srcs       = SRCS + ["libtoml_s7.c", ":mkhdrs"],
+    hdrs       = [":toml_s7.h"],
+    deps       = DEPS + [
         ":toml_array",
         ":toml_datetime",
         ":toml_table",
     ],
-    copts = COPTS + [
-        # "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
-    ],
+    copts      = COPTS,
+    toolchains = TOOLCHAINS,
     visibility = ["//visibility:public"]
 )
 
@@ -53,13 +44,6 @@ cc_shared_library(
     visibility = ["//visibility:public"]
 )
 
-# clibgen(
-#     name = "plugin",
-#     args = ["--script", "$(location libtoml_clibgen.scm)"],
-#     srcs = [":libtoml_clibgen.scm"],
-#     outs = [":libtoml_s7.c"]
-# )
-
 ################################################################
 cc_library(
     name  = "toml_array",
@@ -71,6 +55,7 @@ cc_library(
     ],
     deps  = DEPS,
     copts = COPTS,
+    toolchains = TOOLCHAINS,
 )
 
 cc_library(
@@ -83,6 +68,7 @@ cc_library(
     ],
     deps  = DEPS,
     copts = COPTS,
+    toolchains = TOOLCHAINS,
 )
 
 cc_library(
@@ -95,6 +81,7 @@ cc_library(
     ],
     deps  = DEPS,
     copts = COPTS,
+    toolchains = TOOLCHAINS,
 )
 
 ################################################################

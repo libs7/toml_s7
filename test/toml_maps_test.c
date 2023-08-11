@@ -5,7 +5,7 @@
 
 #include "libs7.h"
 
-#include "clibtest_config.h"
+#include "s7plugin_test_config.h"
 #include "macros.h"
 
 s7_scheme *s7;

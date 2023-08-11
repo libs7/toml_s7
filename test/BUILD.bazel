@@ -1,48 +1,34 @@
-load("@rules_cc//cc:defs.bzl", "cc_test")
-
-load("//:MODULE.bzl",
-     "GOPT_VERSION",
-     "LIBLOGC_VERSION",
-     "S7_TOOLS_VERSION",
-     "UNITY_VERSION",
-     "UTHASH_VERSION")
-
 load("//config/cc:BUILD.bzl",
      "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
      "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
 
-SRCS          = BASE_SRCS + [
+SRCS = BASE_SRCS + [
     "//src:trace_dev.h",
     "macros.h"
-    # "common.c", "common.h",
 ]
 
-DEPS          = BASE_DEPS + [
-    "@s7_tools//src:clibtest_config",
+DEPS = BASE_DEPS + [
+    "@s7_tools//src:s7plugin_test_config",
     "//src:toml_s7",
-    "@gopt//:gopt",
+    "@gopt//src:gopt",
     "@unity//src:unity",
     "@uthash//src:uthash",
 ]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Isrc",
-    "-Iconfig",
-    "-Iexternal/gopt~{}/src".format(GOPT_VERSION),
-    "-Iexternal/unity~{}/src".format(UNITY_VERSION),
-    "-Iexternal/uthash~{}/src".format(UTHASH_VERSION),
-    "-Iexternal/liblogc~{}/src".format(LIBLOGC_VERSION),
-    "-I$(GENDIR)/external/s7_tools~{}/src".format(S7_TOOLS_VERSION),
+    "-I$(@gopt)/src",
+    "-I$(@unity)/src",
+    "-I$(@uthash)/src",
+    "-I$(GENDIR)/$(@s7_tools)/src",
 ]
-
-COPTS         = BASE_COPTS + INCLUDE_PATHS + [
+COPTS = BASE_COPTS + INCLUDE_PATHS + [
     "-Wno-gnu-statement-expression"
 ]
-DEFINES       = BASE_DEFINES
-LINKOPTS      = BASE_LINKOPTS
-
-TIMEOUT = "short"
-
-TAGS = ["toml"]
+DEFINES    = BASE_DEFINES
+LINKOPTS   = BASE_LINKOPTS
+TOOLCHAINS = ["//:test_repo_paths"]
+TIMEOUT    = "short"
+TAGS       = ["toml"]
 
 ################################################################
 test_suite(
@@ -61,102 +47,110 @@ test_suite(
 
 ################################################################
 cc_test(
-    name = "arrays",
-    linkstatic = True,
-    srcs = SRCS + ["toml_arrays_test.c"],
+    name          = "arrays",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_arrays_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["arrays"]
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["arrays"]
 )
 
 cc_test(
-    name = "conversion_alist",
-    linkstatic = True,
-    srcs = SRCS + ["toml_conversion_alist_test.c"],
+    name          = "conversion_alist",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_conversion_alist_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["maps", "conversion"]
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["maps", "conversion"]
 )
 
 cc_test(
-    name = "conversion_ht",
-    linkstatic = True,
-    srcs = SRCS + ["toml_conversion_ht_test.c"],
+    name          = "conversion_ht",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_conversion_ht_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["maps", "conversion"]
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["maps", "conversion"]
 )
 
 cc_test(
-    name = "datetimes",
-    linkstatic = True,
-    srcs = SRCS + ["toml_datetimes_test.c"],
+    name          = "datetimes",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_datetimes_test.c"],
     local_defines = DEFINES,
-    data = ["//test/data:toml"],
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["datetime"]
+    data          = ["//test/data:toml"],
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["datetime"]
 )
 
 cc_test(
-    name = "maps",
-    linkstatic = True,
-    srcs = SRCS + ["toml_maps_test.c"],
+    name          = "maps",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_maps_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["maps"]
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["maps"]
 )
 
 cc_test(
-    name = "readers",
-    linkstatic = True,
-    srcs = SRCS + ["toml_readers_test.c"],
+    name          = "readers",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_readers_test.c"],
     local_defines = DEFINES,
-    data = ["//test/data:toml"], #"//test/data:colors",
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["readers"]
+    data          = ["//test/data:toml"],
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["readers"]
 )
 
 cc_test(
-    name = "serialization",
-    linkstatic = True,
-    srcs = SRCS + ["toml_serialization_test.c"],
+    name          = "serialization",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_serialization_test.c"],
     local_defines = DEFINES,
-    data = ["//test/data:toml"],
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["serialization"]
+    data          = ["//test/data:toml"],
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["serialization"]
 )
 
 cc_test(
-    name = "strings",
-    linkstatic = True,
-    srcs = SRCS + ["toml_strings_test.c"],
+    name          = "strings",
+    linkstatic    = True,
+    srcs          = SRCS + ["toml_strings_test.c"],
     local_defines = DEFINES,
-    data = ["//test/data:toml"],
-    deps = DEPS,
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    timeout = TIMEOUT,
-    tags = TAGS + ["strings"]
+    data          = ["//test/data:toml"],
+    deps          = DEPS,
+    copts         = COPTS,
+    linkopts      = LINKOPTS,
+    toolchains    = TOOLCHAINS,
+    timeout       = TIMEOUT,
+    tags          = TAGS + ["strings"]
 )
 

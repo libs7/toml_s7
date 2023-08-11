@@ -1,5 +1,0 @@
-= libtoml
-
-s7 bindings for tomlc99
-
-Upstream: https://github.com/thesofproject/tomlc99

@@ -1,4 +1,4 @@
 = toml_s7
-s7 bindings for libtoml_cc (tomlc99)
+s7 bindings for tomlc (tomlc99, extended)
 
 WARNING: Not ready for general use.

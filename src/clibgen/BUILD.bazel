@@ -1,0 +1,8 @@
+load("@s7_tools//src:RULES.bzl", "clibgen")
+
+clibgen(
+    name = "clibgen",
+    args = ["--script", "$(location libtoml_clibgen.scm)"],
+    srcs = [":libtoml_clibgen.scm"],
+    outs = [":libtoml_s7.c"]
+)
