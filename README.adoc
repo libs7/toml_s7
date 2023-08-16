@@ -10,36 +10,35 @@ WARNING: Not ready for general use.
 
 == overview
 
-WARNING: `toml_s7` (like the underlying `tomlc99` library) is
+WARNING: `toml_s7` (like the underlying `tomlc` library) is
 read-only! If you need to mutate your toml data, you must convert it
 to Scheme data (using e.g. `+(toml:array->vector a)+`) and mutate the
 result.
 
 === object applicators
 
-`s7` supports object applicators; `+toml_s7+` enables this for
-`toml` tables, arrays, and timestamps. For example, to obtain the
-value for key `+k+` in table object `+t+`, you can apply the object
-directly to the key: [nowrap]`+(t k)+` instead of [nowrap]`+(toml:map-ref t
-k)+`.
+`s7` supports object applicators; `+toml_s7+` enables this for `toml`
+tables, arrays, and timestamps. For example, to obtain the value for
+key `+k+` in table object `+t+`, you can apply the object directly to
+the key: [nowrap]`+(t k)+` instead of [nowrap]`+(toml:map-ref t k)+`.
 
 
 
 === print syntax
 
 Print syntax for foreign objects is `#<obj ...>`. For example, in a
-`repl` the printed form of a `toml` table is [nowrap]`+#<toml-table
-k = v, ...>+`. Arrays will be `+#<toml-array ...>+`.
+`repl` the printed form of a `toml` table is [nowrap]`+#<toml-table k = v, ...>+`. Arrays will be `+#<toml-array ...>+`.
 
 Print syntax is mainly for use in a `repl`, so you can see what you're
 working with. It is _not_ round-trippable with respect to the file
 system: if you write print syntax to a file you will not be able to
 read it back in to Scheme. If you want to save and reload toml data,
 you must convert them to Scheme objects, for example by using
-`+(toml:map->hash-table m)+`, and write that to disk. The cost of this
-is that the toml type information is discarded; for example when you convert a
-toml array to a Scheme vector or list, there is nothing in the result
-to indicate that the data came from a toml array.
+[nowrap]`+(toml:map->hash-table m)+`, and write that to disk. The cost
+of this is that the toml type information is discarded; for example
+when you convert a toml array to a Scheme vector or list, there is
+nothing in the result to indicate that the data came from a toml
+array.
 
 ==== formatting
 
@@ -49,7 +48,7 @@ to indicate that the data came from a toml array.
 
 === data conversion
 
-The `toml_s7` API includes operators to convert from `tomlc99` structs
+The `toml_s7` API includes operators to convert from `tomlc` structs
 to Scheme data, but in general you will not need to use them unless
 you are editing the toml data. Since `toml_s7` data are immutable, you
 would need to convert to Scheme and go from there.
@@ -74,7 +73,7 @@ polymorphic:
 * `+(toml:read p)+` - read port `p`
 * `+(toml:read)+` - read from `current-input-port`.
 
-On success, `+toml:read+` returns a Scheme object wrapping a tomlc99
+On success, `+toml:read+` returns a Scheme object wrapping a tomlc
 `+toml_table_t*+` and satisfying `+toml:map?+`.
 
 The last form listed above, using `+toml:read+` as a thunk (nullary function),
@@ -100,8 +99,8 @@ The `s7` engine also has `with-input-from-string`, so you can do:
 
 == toml:map
 
-For consistency with link:libjson.adoc[libjson], `+toml_s7+` uses the
-term `map` where `toml` uses the term `table`.
+For consistency with link:https://github.com/libs7/cjson_s7[cjson_s7],
+`+toml_s7+` uses the term `map` where `toml` uses the term `table`.
 
 === keys
 
@@ -143,7 +142,7 @@ Low-level bindings:
 Dates and times in toml are based on the
 link:https://tools.ietf.org/html/rfc3339[rfc3339] format.
 
-The `+tomlc99+` library uses the term "timestamp" for date-times; the
+The `+tomlc+` library uses the term "timestamp" for date-times; the
 Scheme API uses `+datetime+`. For example, `(toml:datetime? dt)`
 returns `+#t+` if `+dt+` is a Scheme object wrapping a `+toml_timestamp_t+` struct.
 
@@ -155,7 +154,7 @@ spec] supports use of either 'T' or a space to separate date and time strings:
     1979-05-27T07:32:00Z
     1979-05-27 07:32:00Z
 
-The `tomlc99` library does not retain the separator character, so `toml_s7` normalizes to 'T'.  That means that a datetime like '1979-05-27 07:32:00Z' will print as '1979-05-27T07:32:00Z'.
+The `tomlc` library does not retain the separator character, so `toml_s7` normalizes to 'T'.  That means that a datetime like '1979-05-27 07:32:00Z' will print as '1979-05-27T07:32:00Z'.
 ====
 
 API:
