@@ -1,29 +1,14 @@
 load("//config/cc:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
+     # "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
+     # "BASE_COPTS",
+     "BASE_DEFINES", "BASE_LINKOPTS")
 
-SRCS = BASE_SRCS + [
-    "//src:trace_dev.h",
-    "macros.h"
-]
+load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
 
-DEPS = BASE_DEPS + [
-    "@s7_tools//src:s7plugin_test_config",
-    "//src:toml_s7",
-    "@gopt//src:gopt",
-    "@unity//src:unity",
-    "@uthash//src:uthash",
-]
-INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
-    "-Isrc",
-    "-I$(@gopt)/src",
-    "-I$(@unity)/src",
-    "-I$(@uthash)/src",
-    "-I$(GENDIR)/$(@s7_tools)/src",
-]
-COPTS = BASE_COPTS + INCLUDE_PATHS + [
-    "-Wno-gnu-statement-expression"
-]
+SRCS = ["//src:trace_dev.h", "macros.h"]
+DEPS = ["//src:toml_s7"]
+COPTS = ["-Isrc", "-Wno-gnu-statement-expression"]
+
 DEFINES    = BASE_DEFINES
 LINKOPTS   = BASE_LINKOPTS
 TOOLCHAINS = ["//:test_repo_paths"]
@@ -46,109 +31,101 @@ test_suite(
 )
 
 ################################################################
-cc_test(
+s7_plugin_test(
     name          = "arrays",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_arrays_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
+    local_defines = DEFINES,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "conversion_alist",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_conversion_alist_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
+    local_defines = DEFINES,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps", "conversion"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "conversion_ht",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_conversion_ht_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
+    local_defines = DEFINES,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps", "conversion"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "datetimes",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_datetimes_test.c"],
-    local_defines = DEFINES,
-    data          = ["//test/data:toml"],
     deps          = DEPS,
     copts         = COPTS,
+    data          = ["//test/data:toml"],
+    local_defines = DEFINES,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["datetime"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "maps",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_maps_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
+    local_defines = DEFINES,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "readers",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_readers_test.c"],
-    local_defines = DEFINES,
-    data          = ["//test/data:toml"],
     deps          = DEPS,
     copts         = COPTS,
+    data          = ["//test/data:toml"],
+    local_defines = DEFINES,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["readers"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "serialization",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_serialization_test.c"],
-    local_defines = DEFINES,
-    data          = ["//test/data:toml"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
+    data          = ["//test/data:toml"],
+    local_defines = DEFINES,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["serialization"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "strings",
-    linkstatic    = True,
     srcs          = SRCS + ["toml_strings_test.c"],
-    local_defines = DEFINES,
-    data          = ["//test/data:toml"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
+    data          = ["//test/data:toml"],
+    local_defines = DEFINES,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["strings"]
