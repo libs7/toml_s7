@@ -100,7 +100,8 @@ The `s7` engine also has `with-input-from-string`, so you can do:
 == toml:map
 
 For consistency with link:https://github.com/libs7/cjson_s7[cjson_s7],
-`+toml_s7+` uses the term `map` where `toml` uses the term `table`.
+the `+toml_s7+` Scheme API uses the term `map` where `toml` uses the
+term `table`.
 
 === keys
 
