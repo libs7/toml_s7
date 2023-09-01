@@ -1,0 +1,4 @@
+WARNING: not used. The API is entirely hand-written; it does not for
+the most part export the C API directly. `libtoml_clibgen.scm` is
+included here just for completeness; it could be used to generate
+direct bindings.

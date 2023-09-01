@@ -5,7 +5,7 @@ load("//config/cc:BUILD.bzl",
 
 load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
 
-SRCS = ["//src:trace_dev.h", "macros.h"]
+SRCS = ["macros.h", "//src:trace_dev.h"]
 DEPS = ["//src:toml_s7"]
 COPTS = ["-Isrc", "-Wno-gnu-statement-expression"]
 
@@ -19,20 +19,20 @@ TAGS       = ["toml"]
 test_suite(
     name  = "test",
     tests = [
-        ":arrays",
+        ":arrays_test",
         # ":conversion_alist",
-        ":conversion_ht",
-        ":datetimes",
-        ":maps",
-        ":readers",
-        ":serialization",
-        ":strings",
+        ":conversion_ht_test",
+        ":datetimes_test",
+        ":maps_test",
+        ":readers_test",
+        ":serialization_test",
+        ":strings_test",
     ]
 )
 
 ################################################################
 s7_plugin_test(
-    name          = "arrays",
+    name          = "arrays_test",
     srcs          = SRCS + ["toml_arrays_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -56,7 +56,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "conversion_ht",
+    name          = "conversion_ht_test",
     srcs          = SRCS + ["toml_conversion_ht_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -68,7 +68,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "datetimes",
+    name          = "datetimes_test",
     srcs          = SRCS + ["toml_datetimes_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -81,7 +81,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "maps",
+    name          = "maps_test",
     srcs          = SRCS + ["toml_maps_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -93,7 +93,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "readers",
+    name          = "readers_test",
     srcs          = SRCS + ["toml_readers_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -106,7 +106,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "serialization",
+    name          = "serialization_test",
     srcs          = SRCS + ["toml_serialization_test.c"],
     deps          = DEPS,
     copts         = COPTS,
@@ -119,7 +119,7 @@ s7_plugin_test(
 )
 
 s7_plugin_test(
-    name          = "strings",
+    name          = "strings_test",
     srcs          = SRCS + ["toml_strings_test.c"],
     deps          = DEPS,
     copts         = COPTS,
