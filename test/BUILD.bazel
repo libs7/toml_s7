@@ -1,15 +1,13 @@
-load("//config/cc:BUILD.bzl",
-     # "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     # "BASE_COPTS",
-     "BASE_DEFINES", "BASE_LINKOPTS")
-
 load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
+
+load("//config/cc:CONFIG.bzl",
+     "BASE_COPTS", "BASE_LINKOPTS")
 
 SRCS = ["macros.h", "//src:trace_dev.h"]
 DEPS = ["//src:toml_s7"]
-COPTS = ["-Isrc", "-Wno-gnu-statement-expression"]
+COPTS = BASE_COPTS + ["-Isrc", "-Wno-gnu-statement-expression"]
 
-DEFINES    = BASE_DEFINES
+DEFINES    = []
 LINKOPTS   = BASE_LINKOPTS
 TOOLCHAINS = ["//:test_repo_paths"]
 TIMEOUT    = "short"

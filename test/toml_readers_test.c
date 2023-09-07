@@ -141,9 +141,9 @@ void call_with_input_file(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("interpolation", argc, argv);
 
-    libs7_load_clib(s7, "toml");
+    libs7_load_plugin(s7, "toml");
 
     toml_read = s7_name_to_value(s7, "toml:read");
 

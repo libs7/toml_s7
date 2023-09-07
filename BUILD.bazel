@@ -1,3 +1,4 @@
+load("@libs7//plugin:CONFIG.bzl", "PLUGIN_TEST_DEPS")
 load("@libs7//plugin:MACROS.bzl", "s7_repo_paths")
 
 PROD_REPOS = [
@@ -11,9 +12,5 @@ s7_repo_paths(
 
 s7_repo_paths(
     name = "test_repo_paths",
-    repos = PROD_REPOS + [
-        "@gopt//src:gopt",
-        "@unity//src:unity",
-        "@uthash//src:uthash",
-    ]
+    repos = PROD_REPOS + PLUGIN_TEST_DEPS
 )
