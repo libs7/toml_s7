@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "liblogc.h"
 
 /* #include "utils.h" */
 /* #include "toml.h" */
@@ -13,6 +13,21 @@
 #endif
 
 #include "libtoml_s7.h"
+
+const char *toml_s7_version = TOML_S7_VERSION;
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  toml_s7_trace
+#define DEBUG_LEVEL toml_s7_debug
+bool    TRACE_FLAG = 0;
+int     DEBUG_LEVEL = 0;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+
+extern int s7plugin_trace;
+extern int s7plugin_debug;
+#endif
 
 s7_pointer c_pointer_string, string_string, character_string, boolean_string, real_string, complex_string;
 s7_pointer integer_string;
@@ -26,7 +41,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
 {
     TRACE_ENTRY;
     s7_pointer p, arg;
-    /* TRACE_S7_DUMP("args", args); */
+    /* TRACE_S7_DUMP(0, "args: %s", args); */
 
     /* s7_gc_on(s7, false); */
 
@@ -49,7 +64,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
     } else {
         arg = s7_car(p);
         if (s7_is_input_port(s7, arg)) {
-            TRACE_LOG_DEBUG("SOURCE: input port", "");
+            LOG_DEBUG(0, "SOURCE: input port", "");
             s7_pointer len = s7_call(s7, s7_length,
                                      s7_list(s7, 1, arg));
             s7_pointer ts = s7_call(s7, s7_read_string,
@@ -58,7 +73,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
             /* toml_str = libs7_input_port_to_c_string(s7, arg); */
         }
         else if (s7_is_string(arg)) {
-            TRACE_LOG_DEBUG("SOURCE: string", "");
+            LOG_DEBUG(0, "SOURCE: string", "");
             toml_str = (char*)s7_string(arg);
         }
         else {
@@ -77,10 +92,10 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
                         s7_cons(s7, s7_make_string(s7, (char*)errbuff), s7_nil(s7)));
     } else {
         s7_pointer rval = s7_make_c_object(s7, toml_table_type_tag, (void*)t);
-        /* TRACE_S7_DUMP("tt", rval); */
+        /* TRACE_S7_DUMP(0, "tt: %s", rval); */
         /* log_debug("returning obj"); */
         /* s7_pointer dt = s7_type_of(s7, rval); */
-        /* TRACE_S7_DUMP("typ", dt); */
+        /* TRACE_S7_DUMP(0, "typ: %s", dt); */
         /* log_debug("toml-table? %d", */
         /*           s7_c_object_type(rval) == toml_table_type_tag); */
         /* log_debug("tag: %d", toml_table_type_tag); */
@@ -120,7 +135,7 @@ EXPORT s7_pointer toml_read_file(s7_scheme *s7, char *fname)
         log_debug("returning obj");
         s7_pointer dt = s7_type_of(s7, rval);
         (void)dt;
-        TRACE_S7_DUMP("typ", dt);
+        TRACE_S7_DUMP(0, "typ: %s", dt);
         log_debug("toml-table? %d",
                   s7_c_object_type(rval) == toml_table_type_tag);
         log_debug("tag: %d", toml_table_type_tag);

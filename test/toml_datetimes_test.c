@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_datetimes_test.h"
 
 s7_scheme *s7;
 
@@ -25,6 +27,17 @@ char *expected_str;
 bool verbose;
 bool debug;
 
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
+
 char *cmd;
 
     /* s7_apply_function_star(s7, s7_name_to_value(s7, f), \ */
@@ -41,14 +54,14 @@ void tearDown(void) {
 
 void fields(void) {
     root = TOML_READ("best-day-ever = 1987-07-05T17:45:00Z");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     flag = APPLY_1("toml:map?", root);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     k = s7_make_string(s7, "best-day-ever");
     ts = APPLY_2("toml:map-ref", root, k);
-    TRACE_S7_DUMP("ts", ts);
+    TRACE_S7_DUMP(0, "ts: %s", ts);
     flag = APPLY_1("toml:datetime?", ts);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
     year = APPLY_1("toml:date-year", ts);
@@ -73,19 +86,19 @@ void fields(void) {
  */
 void apply_datetime(void) {
     root = TOML_READ("dt = 1987-07-05T17:45:00Z");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     flag = APPLY_1("toml:map?", root);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     k = s7_make_string(s7, "dt");
     ts = APPLY_2("toml:map-ref", root, k);
-    TRACE_S7_DUMP("ts", ts);
+    TRACE_S7_DUMP(0, "ts: %s", ts);
     flag = APPLY_1("toml:datetime?", ts);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
     year = APPLY_1("toml:date-year", ts);
     flag = APPLY_1("integer?", year);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     TEST_ASSERT_EQUAL_INT(1987, s7_integer(year));
 
@@ -95,9 +108,9 @@ void apply_datetime(void) {
     TEST_ASSERT_TRUE(flag);
 
     year = APPLY_OBJ(ts, k);
-    TRACE_S7_DUMP("year", year);
+    TRACE_S7_DUMP(0, "year: %s", year);
     flag = APPLY_1("integer?", year);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     TEST_ASSERT_EQUAL_INT(1987, s7_integer(year));
 
@@ -143,34 +156,34 @@ void offset_date_time(void) {
                      "odt2 = 1979-05-27T00:32:00-07:00\n"
                      "odt3 = 1979-05-27T00:32:00.999999-17:00\n"
                      "odt4 = 1979-05-27 07:32:00Z");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     /* flag = APPLY_1("toml:map?", root); */
     /* TEST_ASSERT_TRUE(s7_boolean(s7, flag)); */
 
     /* k = s7_make_string(s7, "odt1"); */
     /* ts = APPLY_OBJ(root, k); */
-    /* TRACE_S7_DUMP("ts", ts); */
+    /* TRACE_S7_DUMP(0, "ts: %s", ts); */
     /* flag = APPLY_1("toml:datetime?", ts); */
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     /* TEST_ASSERT_TRUE(s7_boolean(s7, flag)); */
 
     /* // "odt3 = 1979-05-27T00:32:00.999999-07:00\n" */
     /* k = s7_make_string(s7, "odt3"); */
     /* ts = APPLY_OBJ(root, k); */
-    /* TRACE_S7_DUMP("ODT3", ts); */
+    /* TRACE_S7_DUMP(0, "ODT3: %s", ts); */
     /* flag = APPLY_1("toml:datetime?", ts); */
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     /* TEST_ASSERT_TRUE(s7_boolean(s7, flag)); */
     /* k = s7_make_string(s7, "millisecond"); */
     /* millis = APPLY_OBJ(ts, k); */
-    /* TRACE_S7_DUMP("millis", millis); */
+    /* TRACE_S7_DUMP(0, "millis: %s", millis); */
     /* /\* TEST_ASSERT_EQUAL_INT(00, s7_integer(second)); *\/ */
 
     /* k = s7_make_string(s7, "offset"); */
     /* offset = APPLY_OBJ(ts, k); */
-    /* TRACE_S7_DUMP("offset", offset); */
+    /* TRACE_S7_DUMP(0, "offset: %s", offset); */
     /* flag = APPLY_1("string?", offset); */
-    /* /\* TRACE_S7_DUMP("flag", flag); *\/ */
+    /* /\* TRACE_S7_DUMP(0, "flag: %s", flag); *\/ */
     /* TEST_ASSERT_TRUE(s7_boolean(s7, flag)); */
 }
 
@@ -178,14 +191,14 @@ void offset_date_time(void) {
 void local_date_time(void) {
     root = TOML_READ("ldt1 = 1979-05-27T07:32:00\n"
                      "ldt2 = 1979-05-27T00:32:00.999999");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     flag = APPLY_1("toml:map?", root);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     k = s7_make_string(s7, "ldt1");
     ts = APPLY_2("toml:map-ref", root, k);
-    TRACE_S7_DUMP("ts", ts);
+    TRACE_S7_DUMP(0, "ts: %s", ts);
     flag = APPLY_1("toml:datetime?", ts);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 }
 
@@ -193,7 +206,7 @@ void local_date(void) {
     root = TOML_READ("ld1 = 1979-05-27");
     k = s7_make_string(s7, "ld1");
     ts = APPLY_OBJ(root, k);
-    TRACE_S7_DUMP("ts", ts);
+    TRACE_S7_DUMP(0, "ts: %s", ts);
     flag = APPLY_1("toml:datetime?", ts);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 }
@@ -201,20 +214,20 @@ void local_date(void) {
 void local_time(void) {
     root = TOML_READ("lt1 = 07:32:00\n"
                      "lt2 = 00:32:00.999999");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     flag = APPLY_1("toml:map?", root);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     k = s7_make_string(s7, "ldt1");
     ts = APPLY_2("toml:map-ref", root, k);
-    TRACE_S7_DUMP("ts", ts);
+    TRACE_S7_DUMP(0, "ts: %s", ts);
     flag = APPLY_1("toml:datetime?", ts);
-    TRACE_S7_DUMP("flag", flag);
+    TRACE_S7_DUMP(0, "flag: %s", flag);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 }
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("datetimes", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

@@ -1,10 +1,12 @@
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 
 #include "libs7.h"
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_readers_test.h"
 
 s7_scheme *s7;
 
@@ -19,6 +21,17 @@ s7_pointer len, m;
 bool flag_bool;
 bool verbose;
 bool debug;
+
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 char *cmd;
 
@@ -44,7 +57,7 @@ void read_string_port(void) {
     TEST_ASSERT_TRUE(flag_bool);
 
     t = s7_apply_function(s7, toml_read, s7_list(s7, 1, inport));
-    /* TRACE_S7_DUMP("read_string_port", t); */
+    /* TRACE_S7_DUMP(0, "read_string_port: %s", t); */
     flag = APPLY_1("toml:map?", t);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 }
@@ -53,7 +66,7 @@ void with_input_from_string(void) {
     cmd = ""
     "(with-input-from-string \"t = { i = 1, s = \\\"Hello\\\" }\" toml:read)";
     actual = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP("with-input-from-string", actual);
+    TRACE_S7_DUMP(0, "with-input-from-string: %s", actual);
     res = APPLY_1("toml:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -62,7 +75,7 @@ void call_with_input_string(void) {
     cmd = ""
     "(call-with-input-string \"t = { i = 1, s = \\\"Hello\\\" }\" toml:read)";
     actual = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP("call-with-input-string", actual);
+    TRACE_S7_DUMP(0, "call-with-input-string: %s", actual);
     res = APPLY_1("toml:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -111,7 +124,7 @@ void call_with_input_file(void) {
     cmd = ""
     "(call-with-input-file \"test/data/strings.toml\" toml:read)";
     t = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP("t", t);
+    TRACE_S7_DUMP(0, "t: %s", t);
     actual = APPLY_1("toml:map?", t);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
 
@@ -141,7 +154,7 @@ void call_with_input_file(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("readers", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

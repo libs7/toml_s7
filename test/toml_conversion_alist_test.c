@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -148,7 +148,7 @@ void subarray_to_vector(void)
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("conversion_alist", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

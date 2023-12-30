@@ -3,7 +3,7 @@
 */
 
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -12,6 +12,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_serialization_test.h"
 
 s7_scheme *s7;
 
@@ -28,6 +30,17 @@ char *expected_str;
 
 bool verbose;
 bool debug;
+
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 char *cmd;
 
@@ -46,9 +59,9 @@ void tables(void) {
     root = TOML_READ("k1 = 7\nk2 = 'Hello, \"World\"'");
     s1 = s7_apply_function(s7, s7_name_to_value(s7, "object->string"),
                            s7_list(s7, 1, root));
-    TRACE_S7_DUMP("obj->s", s1);
+    TRACE_S7_DUMP(0, "obj->s: %s", s1);
     s2 = s7_make_string(s7, "<#toml-table k1 = 7, k2 = 'Hello, \"World\"'>");
-    TRACE_S7_DUMP("s2", s2);
+    TRACE_S7_DUMP(0, "s2: %s", s2);
     TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2));
 
     s2 = s7_apply_function(s7, s7_name_to_value(s7, "format"),
@@ -56,12 +69,12 @@ void tables(void) {
                                    s7_f(s7), // return string, no stdout
                                    s7_make_string(s7, "~S"),
                                    root));
-    TRACE_S7_DUMP("s2", s2);
+    TRACE_S7_DUMP(0, "s2: %s", s2);
     TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2));
 
     /* s2 = s7_apply_function(s7, s7_name_to_value(s7, "display"), */
     /*                        s7_list(s7, 1, root)); */
-    /* TRACE_S7_DUMP("s2", s2); */
+    /* TRACE_S7_DUMP(0, "s2: %s", s2); */
     /* TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2)); */
 
     /* /\* root tables have empty key  *\/ */
@@ -89,9 +102,9 @@ void arrays(void) {
     root = TOML_READ("k1 = 7\nk2 = 'Hello, \"World\"'");
     s1 = s7_apply_function(s7, s7_name_to_value(s7, "object->string"),
                            s7_list(s7, 1, root));
-    TRACE_S7_DUMP("obj->s", s1);
+    TRACE_S7_DUMP(0, "obj->s: %s", s1);
     s2 = s7_make_string(s7, "<#toml-table k1 = 7, k2 = 'Hello, \"World\"'>");
-    TRACE_S7_DUMP("s2", s2);
+    TRACE_S7_DUMP(0, "s2: %s", s2);
     TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2));
 
     s2 = s7_apply_function(s7, s7_name_to_value(s7, "format"),
@@ -99,12 +112,12 @@ void arrays(void) {
                                    s7_f(s7), // return string, no stdout
                                    s7_make_string(s7, "~S"),
                                    root));
-    TRACE_S7_DUMP("s2", s2);
+    TRACE_S7_DUMP(0, "s2: %s", s2);
     TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2));
 
     /* s2 = s7_apply_function(s7, s7_name_to_value(s7, "display"), */
     /*                        s7_list(s7, 1, root)); */
-    /* TRACE_S7_DUMP("s2", s2); */
+    /* TRACE_S7_DUMP(0, "s2: %s", s2); */
     /* TEST_ASSERT_EQUAL_STRING(s7_string(s1), s7_string(s2)); */
 
     /* /\* root tables have empty key  *\/ */
@@ -128,7 +141,7 @@ void arrays(void) {
 void timestamps(void) {
     root = TOML_READ("ts = 1979-05-27T00:32:00.999999");
     ts = APPLY_OBJ(root, s7_make_string(s7, "ts"));
-    /* TRACE_S7_DUMP("ts", ts); */
+    /* TRACE_S7_DUMP(0, "ts: %s", ts); */
     s1 = s7_object_to_string(s7, ts, // s7_nil(s7));
                              s7_make_symbol(s7, "foo"));
     /* s1 = s7_apply_function(s7, s7_name_to_value(s7, "object->string"), */
@@ -137,7 +150,7 @@ void timestamps(void) {
     /*                                /\* s7_f(s7) *\/ */
     /*                                s7_make_keyword(s7, "readable") */
     /*                                )); */
-    TRACE_S7_DUMP("obj->s", s1);
+    TRACE_S7_DUMP(0, "obj->s: %s", s1);
     /* tomlc99 truncates secfrac to millis */
     /* expected_str = "\"1979-05-27T00:32:00.999\""; */
     /* TEST_ASSERT_EQUAL_STRING(expected_str, s7_string(s1)); */
@@ -147,13 +160,13 @@ void timestamps(void) {
     /*                                s7_f(s7), // return string, no stdout */
     /*                                s7_make_string(s7, "~A"), */
     /*                                ts)); */
-    /* TRACE_S7_DUMP("s2", s2); */
+    /* TRACE_S7_DUMP(0, "s2: %s", s2); */
     /* TEST_ASSERT_EQUAL_STRING(expected_str, s7_string(s2)); */
 }
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("serialization", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

@@ -1,15 +1,19 @@
+load("@makeheaders//rules:makeheaders.bzl", "makeheaders")
 load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
-
 load("//config/cc:CONFIG.bzl",
-     "BASE_COPTS", "BASE_LINKOPTS")
+     "BASE_COPTS", "BASE_LINKOPTS", "PROFILE")
 
-SRCS = ["macros.h", "//src:trace_dev.h"]
-DEPS = ["//src:toml_s7"]
-COPTS = BASE_COPTS + ["-Isrc", "-Wno-gnu-statement-expression"]
+SRCS = ["macros.h"] # , "//lib:trace_dev.h"]
+DEPS = ["//lib:toml_s7"]
+COPTS = BASE_COPTS + [
+    "-Ilib",
+    "-Wno-gnu-statement-expression",
+    "-I$(GENDIR)/test"
+]
 
-DEFINES    = []
+DEFINES    = PROFILE
 LINKOPTS   = BASE_LINKOPTS
-TOOLCHAINS = ["//:test_repo_paths"]
+
 TIMEOUT    = "short"
 TAGS       = ["toml"]
 
@@ -18,7 +22,7 @@ test_suite(
     name  = "test",
     tests = [
         ":arrays_test",
-        # ":conversion_alist",
+        # ":conversion_alist_test",
         ":conversion_ht_test",
         ":datetimes_test",
         ":maps_test",
@@ -31,101 +35,118 @@ test_suite(
 ################################################################
 s7_plugin_test(
     name          = "arrays_test",
-    srcs          = SRCS + ["toml_arrays_test.c"],
+    srcs          = SRCS + ["toml_arrays_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays"]
 )
 
 s7_plugin_test(
-    name          = "conversion_alist",
+    name          = "conversion_alist_test",
     srcs          = SRCS + ["toml_conversion_alist_test.c"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps", "conversion"]
 )
 
 s7_plugin_test(
     name          = "conversion_ht_test",
-    srcs          = SRCS + ["toml_conversion_ht_test.c"],
+    srcs          = SRCS + ["toml_conversion_ht_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     local_defines = DEFINES,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps", "conversion"]
 )
 
 s7_plugin_test(
     name          = "datetimes_test",
-    srcs          = SRCS + ["toml_datetimes_test.c"],
+    srcs          = SRCS + ["toml_datetimes_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     data          = ["//test/data:toml"],
     local_defines = DEFINES,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["datetime"]
 )
 
 s7_plugin_test(
     name          = "maps_test",
-    srcs          = SRCS + ["toml_maps_test.c"],
+    srcs          = SRCS + ["toml_maps_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     local_defines = DEFINES,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps"]
 )
 
 s7_plugin_test(
     name          = "readers_test",
-    srcs          = SRCS + ["toml_readers_test.c"],
+    srcs          = SRCS + ["toml_readers_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     data          = ["//test/data:toml"],
     local_defines = DEFINES,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["readers"]
 )
 
 s7_plugin_test(
     name          = "serialization_test",
-    srcs          = SRCS + ["toml_serialization_test.c"],
+    srcs          = SRCS + ["toml_serialization_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     data          = ["//test/data:toml"],
     local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["serialization"]
 )
 
 s7_plugin_test(
     name          = "strings_test",
-    srcs          = SRCS + ["toml_strings_test.c"],
+    srcs          = SRCS + ["toml_strings_test.c", ":mkhdrs"],
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     data          = ["//test/data:toml"],
     local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["strings"]
 )
 
+########
+makeheaders(
+    name = "mkhdrs",
+    hdrs_srcs = [
+        "toml_arrays_test.c",
+        "toml_conversion_ht_test.c",
+        "toml_datetimes_test.c",
+        "toml_maps_test.c",
+        "toml_readers_test.c",
+        "toml_serialization_test.c",
+        "toml_strings_test.c"
+    ],
+    additional_srcs = [
+        "@makeheaders//logging:ansi_colors.h"
+    ] + select({
+        "@makeheaders//compilation_mode:fastbuild": [
+            "@libs7//logging:s7_macros_debug.h",
+            "@makeheaders//logging:macros_debug.h"
+        ],
+        "//conditions:default": [
+            "@libs7//logging:s7_macros_ndebug.h",
+            "@makeheaders//logging:macros_ndebug.h"
+        ]
+    }),
+)

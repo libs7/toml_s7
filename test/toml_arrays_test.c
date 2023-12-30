@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_arrays_test.h"
 
 s7_scheme *s7;
 
@@ -19,8 +21,18 @@ s7_pointer lst, alst, vec, ht, s1, s2;
 s7_pointer len, m;
 s7_pointer tmp;
 
-bool verbose;
-bool debug;
+int  s7plugin_verbosity;
+
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 char *cmd;
 
@@ -399,7 +411,7 @@ void nested_array_to_string(void) {
     a = APPLY_2("toml:map-ref", root, k);
     actual = APPLY_1("toml:array?", a);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_LOG_DEBUG("running object->string", "");
+    LOG_DEBUG(0, "running object->string", "");
     res = APPLY_1("object->string", a);
     TEST_ASSERT_EQUAL_STRING("#<toml-array #<toml-array 1, 2>, #<toml-array 3, 4>>", s7_string(res));
 
@@ -412,7 +424,7 @@ void nested_array_to_string(void) {
     a = APPLY_2("toml:map-ref", root, k);
     actual = APPLY_1("toml:array?", a);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_LOG_DEBUG("running object->string", "");
+    LOG_DEBUG(0, "running object->string", "");
     res = APPLY_1("object->string", a);
     TEST_ASSERT_EQUAL_STRING("#<toml-array #<toml-array 1, 2, #<toml-array 3, 4>>, #<toml-array 5, 6>>", s7_string(res));
 }
@@ -424,12 +436,12 @@ void root_array_1(void) {
         "first_name = \"Bruce\"\n"
         "last_name = \"Springsteen\"\n"
                      "");
-    TRACE_S7_DUMP("root", root);
+    TRACE_S7_DUMP(0, "root: %s", root);
     actual = APPLY_1("toml:map?", root);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
 
     ht = APPLY_1("toml:map->hash-table", root);
-    /* TRACE_S7_DUMP("ht", ht); */
+    /* TRACE_S7_DUMP(0, "ht: %s", ht); */
     /* b = APPLY_1("hash-table?", ht); */
     TEST_ASSERT_EQUAL(true, s7_is_hash_table(ht));
 
@@ -438,18 +450,18 @@ void root_array_1(void) {
     a = APPLY_2("toml:map-ref", root, k);
     b = APPLY_1("toml:array?", a);
     TEST_ASSERT_EQUAL(s7_t(s7), b);
-    TRACE_S7_DUMP("people", a);
+    TRACE_S7_DUMP(0, "people: %s", a);
 
     // and from hash-table
     k = s7_make_keyword(s7, "people");
     a = APPLY_2("hash-table-ref", ht, k);
-    TRACE_S7_DUMP("people", a);
+    TRACE_S7_DUMP(0, "people: %s", a);
     tmp = s7_type_of(s7, a);
-    TRACE_S7_DUMP("typ", tmp);
+    TRACE_S7_DUMP(0, "typ: %s", tmp);
     TEST_ASSERT_EQUAL(true, s7_is_vector(a));
     /* b = APPLY_1("hash-table?", a); */
     /* TEST_ASSERT_EQUAL(s7_t(s7), b); */
-    TRACE_S7_DUMP("people", a);
+    TRACE_S7_DUMP(0, "people: %s", a);
 
     /* toml = "a = [[1, 2, [3, 4]], [5, 6]]\""; */
     /* root = TOML_READ(toml); */
@@ -460,14 +472,14 @@ void root_array_1(void) {
     /* a = APPLY_2("toml:map-ref", root, k); */
     /* actual = APPLY_1("toml:array?", a); */
     /* TEST_ASSERT_EQUAL(actual, s7_t(s7)); */
-    /* TRACE_LOG_DEBUG("running object->string", ""); */
+    /* LOG_DEBUG(0, "running object->string", ""); */
     /* res = APPLY_1("object->string", a); */
     /* TEST_ASSERT_EQUAL_STRING("[[1, 2, [3, 4]], [5, 6]]", s7_string(res)); */
 }
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("arrays", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

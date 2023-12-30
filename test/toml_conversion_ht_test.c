@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_conversion_ht_test.h"
 
 s7_scheme *s7;
 
@@ -27,6 +29,16 @@ char *cmd, *sexp_str;
 bool verbose;
 bool debug;
 
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 /* #define TOML_READ(s) \ */
 /*     s7_apply_function(s7, s7_name_to_value(s7, "toml:read"),    \ */
@@ -78,7 +90,7 @@ void nested_table_to_hash_table(void)
 {
     tt = TOML_READ("a = { b = 0 }");
     ht = APPLY_1("toml:map->hash-table", tt);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     flag = APPLY_1("hash-table?", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
@@ -86,7 +98,7 @@ void nested_table_to_hash_table(void)
 
     sexp_str = "(hash-table :a (hash-table :b 0))";
     expected = EVAL(sexp_str);
-    TRACE_S7_DUMP("expected", expected);
+    TRACE_S7_DUMP(0, "expected: %s", expected);
     flag = APPLY_1("hash-table?", expected);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
@@ -116,7 +128,7 @@ void subarray_to_vector(void)
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
 
-    /* TRACE_S7_DUMP("actual", actual); */
+    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
 
     sexp_str = "(hash-table \"a\" #(1 2 3))";
     expected = EVAL(sexp_str);
@@ -156,13 +168,13 @@ void subarray_of_tables(void)
 
     // WARNING: serialization prints '#(...)' but the reader needs
     // '(vector...)'.
-    /* TRACE_S7_DUMP("actual  ", actual); */
+    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
     /* actual_s7str = s7_object_to_string(s7, actual, true); */
     /* actual_s7str = s7_apply_function(s7, s7_name_to_value(s7, */
     /*                                                       "object->string"), */
     /*                                  s7_list(s7, 2, actual, s7_t(s7))); */
     /* actual_s7str = APPLY_1("object->string", actual); */
-    /* TRACE_S7_DUMP("object->string actual  ", actual_s7str); */
+    /* TRACE_S7_DUMP(0, "object->string actual: %s", actual_s7str); */
     /* log_debug("XXXX %s", s7_string(actual_s7str)); */
 
     // trying (format ...
@@ -180,18 +192,18 @@ void subarray_of_tables(void)
     flag = APPLY_1("c-pointer?", expected);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
 
-    /* TRACE_S7_DUMP("expected", expected); */
+    /* TRACE_S7_DUMP(0, "expected: %s", expected); */
 
     /* TEST_ASSERT_EQUAL_STRING(sexp, s7_string(actual_str)); */
 
     expected_s7str = APPLY_1("object->string", expected);
-    /* TRACE_S7_DUMP("expected s7str", expected_s7str); */
+    /* TRACE_S7_DUMP(0, "expected s7str: %s", expected_s7str); */
     /* log_debug("expected str: %s", expected_str); */
     /* TEST_ASSERT_EQUAL_STRING(sexp, s7_string(expected_str)); */
 
     flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"),
                              s7_list(s7, 2, actual, expected));
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     // verify value at "a" of toml-table is a toml-array
@@ -205,16 +217,16 @@ void subarray_of_tables(void)
     suba = APPLY_2("hash-table-ref", actual, k);
     flag = APPLY_1("vector?", suba);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
-    /* TRACE_S7_DUMP("suba", suba); */
+    /* TRACE_S7_DUMP(0, "suba: %s", suba); */
     // compare it to expected
     tmp = APPLY_2("hash-table-ref", expected, k);
     flag = APPLY_1("vector?", tmp);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
-    /* TRACE_S7_DUMP("tmp", tmp); */
+    /* TRACE_S7_DUMP(0, "tmp: %s", tmp); */
 
     flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"),
                              s7_list(s7, 2, suba, tmp));
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     // verify that mbrs of vector are hash-tables
@@ -229,20 +241,20 @@ void subarray_of_tables(void)
 
     // compare to expected
     tmp1 = APPLY_2("vector-ref", tmp, i0);
-    /* TRACE_S7_DUMP("tmp1", tmp1); */
+    /* TRACE_S7_DUMP(0, "tmp1: %s", tmp1); */
     flag = APPLY_1("hash-table?", tmp1);
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"),
                              s7_list(s7, 2, subt1, tmp1));
-    /* TRACE_S7_DUMP("flag", flag); */
+    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 }
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("conversion_ht", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

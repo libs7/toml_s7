@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_strings_test.h"
 
 s7_scheme *s7;
 
@@ -20,6 +22,17 @@ char *expected_str;
 
 bool verbose;
 bool debug;
+
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 char *cmd;
 
@@ -183,7 +196,7 @@ void multiline_single_quotes(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("strings", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

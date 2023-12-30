@@ -4,7 +4,7 @@
 #include "gopt.h"
 #include "libs7.h"
 
-#include "trace_dev.h"
+/* #include "trace_dev.h" */
 
 #define DQ3 "\"\"\""
 #define SQ3 "'''"

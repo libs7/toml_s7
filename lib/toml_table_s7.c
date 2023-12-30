@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "log.h"
+#include "liblogc.h"
 
 #if INTERFACE
 #include "libs7.h"
@@ -10,6 +10,19 @@
 #endif
 
 #include "toml_table_s7.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  toml_s7_trace
+#define DEBUG_LEVEL toml_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+
+extern int s7plugin_trace;
+extern int s7plugin_debug;
+#endif
 
 int toml_table_type_tag = 0;
 
@@ -94,10 +107,10 @@ s7_pointer toml_table_keys(s7_scheme *s7, s7_pointer args)
     const char* k;
     for (int i = 0; i < key_ct; i++) {
         k = toml_key_in(t, i);
-        /* TRACE_LOG_DEBUG("table key: %s", k); */
+        /* LOG_DEBUG(0, "table key: %s", k); */
         s7_list_set(s7, keys, i, s7_make_string(s7, k));
     }
-    /* TRACE_S7_DUMP("keys", keys); */
+    /* TRACE_S7_DUMP(0, "keys: %s", keys); */
     return keys;
 }
 
@@ -121,11 +134,11 @@ s7_pointer toml_table_values(s7_scheme *s7, s7_pointer args)
     const char* k;
     for (int i = 0; i < key_ct; i++) {
         k = toml_key_in(t, i);
-        /* TRACE_LOG_DEBUG("table key: %s", k); */
+        /* LOG_DEBUG(0, "table key: %s", k); */
         //FIXME: get value for key
         s7_list_set(s7, keys, i, s7_make_string(s7, k));
     }
-    /* TRACE_S7_DUMP("keys", keys); */
+    /* TRACE_S7_DUMP(0, "keys: %s", keys); */
     return s7_unspecified(s7);
 }
 
@@ -148,16 +161,16 @@ s7_pointer g_toml_table_ref(s7_scheme *s7, s7_pointer args)
     arg = s7_car(p);
     if (s7_is_string(arg)) {
         key = (char*)s7_string(arg);
-        TRACE_LOG_DEBUG("key type string: %s", key);
+        LOG_DEBUG(0, "key type string: %s", key);
     }
     else if (s7_is_keyword(arg)) {
         s7_pointer sym = s7_keyword_to_symbol(s7, arg);
         key = (char*)s7_symbol_name(sym);
-        TRACE_LOG_DEBUG("key type keyword: %s", key);
+        LOG_DEBUG(0, "key type keyword: %s", key);
     }
     else if (s7_is_symbol(arg)) {
         key = (char*)s7_symbol_name(arg);
-        TRACE_LOG_DEBUG("key type symbol: %s", key);
+        LOG_DEBUG(0, "key type symbol: %s", key);
     }
     else {
           return(s7_wrong_type_error(s7, s7_make_string_wrapper_with_length(s7, "toml:map-ref", 14), 2, arg, string_string));
@@ -194,31 +207,31 @@ s7_pointer g_toml_table_ref(s7_scheme *s7, s7_pointer args)
 
     toml_array_t *a = toml_array_in(tt, key);
     if (a) {
-        /* TRACE_LOG_DEBUG("array"); */
+        /* LOG_DEBUG(0, "array"); */
         s7_pointer rval = s7_make_c_object(s7,
                                            toml_array_type_tag,
                                            (void*)a);
         return rval;
     } else {
-        /* TRACE_LOG_DEBUG("not array"); */
+        /* LOG_DEBUG(0, "not array"); */
     }
 
     toml_table_t *subt = toml_table_in(tt, key);
     if (subt) {
-        /* TRACE_LOG_DEBUG("table: %p", subt); */
+        /* LOG_DEBUG(0, "table: %p", subt); */
         s7_pointer rval = s7_make_c_object(s7,
                                            toml_table_type_tag,
                                            (void*)subt);
         /* void *optr = (void*)s7_c_object_value(rval); */
         /* void *optr = (void*)s7_c_object_value_checked(rval, toml_table_type_tag); */
-        /* TRACE_LOG_DEBUG("rval ptr: %p", rval); */
-        /* TRACE_LOG_DEBUG("rval objptr: %p", optr); */
+        /* LOG_DEBUG(0, "rval ptr: %p", rval); */
+        /* LOG_DEBUG(0, "rval objptr: %p", optr); */
 
         return rval;
     } else {
-        /* TRACE_LOG_DEBUG("not table"); */
+        /* LOG_DEBUG(0, "not table"); */
     }
-    TRACE_LOG_DEBUG("not found; returning #<unspecified>", "");
+    LOG_DEBUG(0, "not found; returning #<unspecified>", "");
     return(s7_unspecified(s7));
 }
 
@@ -336,7 +349,7 @@ static s7_pointer g_toml_table_to_string(s7_scheme *s7, s7_pointer args)
     }
 
     char *s = tomlx_table_to_string(tt, print_syntax);
-    TRACE_LOG_DEBUG("returning: %s", s);
+    LOG_DEBUG(0, "returning: %s", s);
     return s7_make_string(s7, s);
 }
 
@@ -358,7 +371,7 @@ void toml_table_init(s7_scheme *s7, s7_pointer cur_env)
 {
     TRACE_ENTRY;
     toml_table_type_tag = s7_make_c_type(s7, "toml_table");
-    /* TRACE_LOG_DEBUG("toml_table_type_tag: %d", toml_table_type_tag); */
+    /* LOG_DEBUG(0, "toml_table_type_tag: %d", toml_table_type_tag); */
 
     s7_c_type_set_gc_free      (s7, toml_table_type_tag, free_toml_table);
     s7_c_type_set_gc_mark      (s7, toml_table_type_tag, mark_toml_table);
@@ -430,16 +443,16 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
             log_error("toml_key_in failure for key: %s", k);
             return NULL;
         }
-        TRACE_LOG_DEBUG("table key: %s", k);
+        LOG_DEBUG(0, "table key: %s", k);
 
         datum = tomlx_table_datum_for_key(tt, (char*)k, &typ);
         /* char *seq_str; */
-        TRACE_LOG_DEBUG("datum typ: %d", typ);
+        LOG_DEBUG(0, "datum typ: %d", typ);
         if (typ == TOML_NONDATUM) {
             void *seq = tomlx_table_seq_for_key(tt, (char*)k, &typ);
             switch(typ) {
             case TOML_ARRAY:
-                TRACE_LOG_DEBUG("array seq: %p", seq);
+                LOG_DEBUG(0, "array seq: %p", seq);
                 if (clone) {
                     s7_pointer lst = toml_array_to_vector(s7,
                                                         (toml_array_t*)seq,
@@ -457,9 +470,9 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
                 }
                 break;
             case TOML_TABLE:
-                TRACE_LOG_DEBUG("table seq: %p", seq);
+                LOG_DEBUG(0, "table seq: %p", seq);
                 if (clone) {
-                    TRACE_LOG_DEBUG(" to hash", "");
+                    LOG_DEBUG(0, " to hash", "");
                     s7_pointer ht = toml_table_to_hash_table(s7,
                                                         (toml_table_t*)seq,
                                                         clone);
@@ -481,7 +494,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
         } else {
             switch(typ) {
             case TOML_INT:
-                TRACE_LOG_DEBUG("toml datum val: %d", datum.u.i);
+                LOG_DEBUG(0, "toml datum val: %d", datum.u.i);
                 s7_hash_table_set(s7,
                                   the_ht,
                                   /* s7_make_keyword(s7, k), */
@@ -490,7 +503,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
                                   s7_make_integer(s7, datum.u.i));
                 break;
             case TOML_STRING:
-                TRACE_LOG_DEBUG("toml datum val: %s", datum.u.s);
+                LOG_DEBUG(0, "toml datum val: %s", datum.u.s);
                 s7_hash_table_set(s7,
                                   the_ht,
                                   s7_make_keyword(s7, k),
@@ -499,7 +512,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
                 break;
             case TOML_BOOL:
                 // tomlc99 bool val is int
-                TRACE_LOG_DEBUG("toml datum val: %d", datum.u.b);
+                LOG_DEBUG(0, "toml datum val: %d", datum.u.b);
                 if (datum.u.b) {
 
                 } else {
@@ -507,7 +520,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
                 }
                 break;
             case TOML_DOUBLE:
-                TRACE_LOG_DEBUG("toml datum val: %g", datum.u.d);
+                LOG_DEBUG(0, "toml datum val: %g", datum.u.d);
                 break;
             case TOML_TIMESTAMP:
                 {
@@ -537,7 +550,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
             }
         }
     }
-    TRACE_S7_DUMP("returning ht", the_ht);
+    TRACE_S7_DUMP(0, "returning ht: %s", the_ht);
     return the_ht;
 }
 

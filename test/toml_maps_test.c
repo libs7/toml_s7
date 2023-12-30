@@ -1,4 +1,4 @@
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -7,6 +7,8 @@
 
 #include "s7plugin_test_config.h"
 #include "macros.h"
+
+#include "toml_maps_test.h"
 
 s7_scheme *s7;
 
@@ -20,6 +22,17 @@ char *expected_str;
 
 bool verbose;
 bool debug;
+
+#if defined(PROFILE_fastbuild)
+#define DEBUG_LEVEL toml_s7_debug
+#define TRACE_FLAG toml_s7_trace
+extern int  DEBUG_LEVEL;        /* defined in libtoml_s7.c */
+extern bool TRACE_FLAG;        /* defined in libtoml_s7.c */
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int libs7_debug;
+extern int s7plugin_debug;
+#endif
 
 char *cmd;
 
@@ -56,12 +69,12 @@ void tearDown(void) {
 /* tlt is (a nameless) table, NOT a kv pair!  */
 void root_tables(void) {
     t = TOML_READ("m = true");
-    TRACE_S7_DUMP("tt", t);
+    TRACE_S7_DUMP(0, "tt: %s", t);
     actual = APPLY_1("toml:map?", t);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
     k = s7_make_string(s7, "m");
     a = APPLY_2("toml:map-ref", t, k);
-    TRACE_S7_DUMP("a", a);
+    TRACE_S7_DUMP(0, "a: %s", a);
     flag = APPLY_1("boolean?", a);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
@@ -246,7 +259,7 @@ void table_serialization(void) {
     /* actual = APPLY_FORMAT("~A", t); */
     res = s7_apply_function(s7, s7_name_to_value(s7, "object->string"),
                             s7_list(s7, 1, t));
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
 
     /* res = s7_apply_function(s7, s7_name_to_value(s7, "format"), */
     /*                         s7_list(s7, 3, */
@@ -254,7 +267,7 @@ void table_serialization(void) {
     /*                                 s7_make_string(s7, "~A"), */
     /*                                 t)); */
     /* log_debug("xxxxxxxxxxxxxxxx"); */
-    /* TRACE_S7_DUMP("fmt", res); */
+    /* TRACE_S7_DUMP(0, "fmt: %s", res); */
     /* TEST_ASSERT_EQUAL(actual, s7_t(s7)); */
 
     /* /\* root tables have empty key  *\/ */
@@ -301,7 +314,7 @@ void to_string_atoms(void) {
     /* // timestamps (not yet) */
     /* t = TOML_READ("k1 = 'Hi there'\nk2 = ', World'"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table k1 = 'Hi there', k2 = ', World'>", */
     /*                          s7_string(res)); */
 }
@@ -310,7 +323,7 @@ void to_string_arrays(void) {
     // bool arrays
     t = TOML_READ("ba = [true, false]");
     res = APPLY_1("object->string", t);
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
     TEST_ASSERT_EQUAL_STRING("#<toml-table ba = #<toml-array true, false>>",
                              s7_string(res));
     // int arrays
@@ -321,21 +334,21 @@ void to_string_arrays(void) {
     // double arrays
     t = TOML_READ("da = [1.2, 3.4]");
     res = APPLY_1("object->string", t);
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
     TEST_ASSERT_EQUAL_STRING("#<toml-table da = #<toml-array 1.2, 3.4>>",
                              s7_string(res));
 
     // string arrays
     t = TOML_READ("sa = ['Hey there', 'you old world']");
     res = APPLY_1("object->string", t);
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
     TEST_ASSERT_EQUAL_STRING("#<toml-table sa = #<toml-array \"Hey there\", \"you old world\">>",
                              s7_string(res));
 
     /* // timestamp arrays (not yet) */
     /* t = TOML_READ("k1 = 'Hi there'\nk2 = ', World'"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table k1 = \"Hi there\", k2 = \", World\">", */
     /*                          s7_string(res)); */
 }
@@ -344,7 +357,7 @@ void to_string_subtables(void) {
     // bool values
     t = TOML_READ("a1 = { a1b1 = true }\na2 = 9");
     res = APPLY_1("object->string", t);
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
     TEST_ASSERT_EQUAL_STRING("#<toml-table a2 = 9, a1 = #<toml-table a1b1 = true>>",
                              s7_string(res));
     /* // int arrays */
@@ -355,21 +368,21 @@ void to_string_subtables(void) {
     /* // double arrays */
     /* t = TOML_READ("da = [1.2, 3.4]"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table da = [1.2, 3.4]>", */
     /*                          s7_string(res)); */
 
     /* // string arrays */
     /* t = TOML_READ("sa = ['Hey there', 'you old world']"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table sa = ['Hey there', 'you old world']>", */
     /*                          s7_string(res)); */
 
     /* // timestamp arrays (not yet) */
     /* t = TOML_READ("k1 = 'Hi there'\nk2 = ', World'"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table k1 = 'Hi there', k2 = ', World'>", */
     /*                          s7_string(res)); */
 }
@@ -377,7 +390,7 @@ void to_string_subtables(void) {
 void to_string_mixed(void) {
     t = TOML_READ("a1 = [ {a1b1 = [1, 2] } ]");
     res = APPLY_1("object->string", t);
-    TRACE_S7_DUMP("obj->s", res);
+    TRACE_S7_DUMP(0, "obj->s: %s", res);
     expected_str = "#<toml-table a1 = #<toml-array #<toml-table a1b1 = #<toml-array 1, 2>>>>";
     TEST_ASSERT_EQUAL_STRING(expected_str, s7_string(res));
 
@@ -392,21 +405,21 @@ void to_string_mixed(void) {
     /* // double arrays */
     /* t = TOML_READ("da = [1.2, 3.4]"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table da = [1.2, 3.4]>", */
     /*                          s7_string(res)); */
 
     /* // string arrays */
     /* t = TOML_READ("sa = ['Hey there', 'you old world']"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table sa = ['Hey there', 'you old world']>", */
     /*                          s7_string(res)); */
 
     /* // timestamp arrays (not yet) */
     /* t = TOML_READ("k1 = 'Hi there'\nk2 = ', World'"); */
     /* res = APPLY_1("object->string", t); */
-    /* TRACE_S7_DUMP("obj->s", res); */
+    /* TRACE_S7_DUMP(0, "obj->s: %s", res); */
     /* TEST_ASSERT_EQUAL_STRING("#<toml-table k1 = 'Hi there', k2 = ', World'>", */
     /*                          s7_string(res)); */
 }
@@ -460,7 +473,7 @@ void dotted_keys(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = s7_plugin_initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("maps", argc, argv);
 
     libs7_load_plugin(s7, "toml");
 

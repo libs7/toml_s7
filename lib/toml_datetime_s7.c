@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "log.h"
+#include "liblogc.h"
 
 #if INTERFACE
 #include "libs7.h"
@@ -10,6 +10,19 @@
 #endif
 
 #include "toml_datetime_s7.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  toml_s7_trace
+#define DEBUG_LEVEL toml_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+
+extern int s7plugin_trace;
+extern int s7plugin_debug;
+#endif
 
 int toml_datetime_type_tag = 0;
 
@@ -141,7 +154,7 @@ static s7_pointer g_toml_datetime_ref(s7_scheme *s7, s7_pointer args)
     }
     else return(s7_wrong_type_error(s7, s7_make_string_wrapper_with_length(s7, "toml:map-ref", 14), 2, arg, string_string));
 
-    TRACE_LOG_DEBUG("ref key: %s", key);
+    LOG_DEBUG(0, "ref key: %s", key);
     if ((strncmp(key, "year", 4) == 0) && (strlen(key) == 4)) {
         return(s7_make_integer(s7, *ts->year));
     }
@@ -252,7 +265,7 @@ static s7_pointer g_toml_datetime_to_hash_table(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
 {
     TRACE_ENTRY;
-    TRACE_LOG_DEBUG("arg ct: %d", s7_list_length(s7, args));
+    LOG_DEBUG(0, "arg ct: %d", s7_list_length(s7, args));
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -266,7 +279,7 @@ static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
     p = s7_cdr(p);
     if (p != s7_nil(s7)) {
         arg = s7_car(p);
-        TRACE_S7_DUMP("boolarg", arg);
+        TRACE_S7_DUMP(0, "boolarg: %s", arg);
         if (s7_is_boolean(arg)) {
             use_write = s7_boolean(s7, arg);
         } else {
@@ -275,7 +288,7 @@ static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
     }
 
     char *s = tomlx_datetime_to_string(ts, use_write);
-    TRACE_LOG_DEBUG("returning: %s", s);
+    LOG_DEBUG(0, "returning: %s", s);
     return s7_make_string(s7, s);
 }
 
@@ -296,7 +309,7 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 {
     TRACE_ENTRY;
     toml_datetime_type_tag = s7_make_c_type(s7, "toml_datetime");
-    /* TRACE_LOG_DEBUG("toml_datetime_type_tag: %d", toml_datetime_type_tag); */
+    /* LOG_DEBUG(0, "toml_datetime_type_tag: %d", toml_datetime_type_tag); */
 
     s7_c_type_set_gc_free      (s7, toml_datetime_type_tag, g_free_toml_datetime);
     s7_c_type_set_gc_mark      (s7, toml_datetime_type_tag, g_mark_toml_datetime);
@@ -370,7 +383,7 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 /* char *tomlx_datetime_to_string(toml_timestamp_t *ts, bool use_write) */
 /* { */
 /*     TRACE_ENTRY; */
-/*     TRACE_LOG_DEBUG("use_write: %d", use_write); */
+/*     LOG_DEBUG(0, "use_write: %d", use_write); */
 /*     const int BUFSZ = 4096; */
 /*     char *buf;          /\* WARNING: malloc *\/ */
 /*     buf = calloc(BUFSZ, sizeof(char)); */
@@ -378,7 +391,7 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 /*         log_error("OOM"); */
 /*         return NULL; */
 /*     } else { */
-/*         TRACE_LOG_DEBUG("callocated %d chars for buffer", BUFSZ); */
+/*         LOG_DEBUG(0, "callocated %d chars for buffer", BUFSZ); */
 /*     } */
 /*     size_t bufsz = BUFSZ; */
 /*     size_t char_ct = 0; */
@@ -388,14 +401,14 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 /*     // print leading " */
 /*     if (use_write) { */
 /*         errno = 0; */
-/*         TRACE_LOG_DEBUG("snprintfing header", ""); */
+/*         LOG_DEBUG(0, "snprintfing header", ""); */
 /*         // FIXME: check buf sz */
 /*         ct = snprintf(buf, 2, "%s", "\""); */
 /*         if (errno) { */
 /*             log_error("snprintf: %s", strerror(errno)); */
 /*             return NULL; */
 /*         } else { */
-/*             TRACE_LOG_DEBUG("snprintf hdr ct: %d", ct); */
+/*             LOG_DEBUG(0, "snprintf hdr ct: %d", ct); */
 /*         } */
 /*         char_ct += 1; // do not include terminating '\0' */
 /*     } */
@@ -440,19 +453,19 @@ void toml_datetime_init(s7_scheme *s7, s7_pointer cur_env)
 /*     // print footer */
 /*     if (use_write) { */
 /*         errno = 0; */
-/*         TRACE_LOG_DEBUG("snprintfing datetime footer", ""); */
+/*         LOG_DEBUG(0, "snprintfing datetime footer", ""); */
 /*         ct = snprintf(buf+char_ct, 2, "%s", "\""); */
 /*         if (errno) { */
 /*             log_error("snprintf: %s", strerror(errno)); */
 /*             return NULL; */
 /*         } else { */
-/*             TRACE_LOG_DEBUG("snprintf footer ct: %d", ct); */
+/*             LOG_DEBUG(0, "snprintf footer ct: %d", ct); */
 /*         } */
 /*         char_ct += 1; // do not include terminating '\0' */
-/*         TRACE_LOG_DEBUG("buf len: %d", strlen(buf)); */
-/*         TRACE_LOG_DEBUG("buf: %s", buf); */
+/*         LOG_DEBUG(0, "buf len: %d", strlen(buf)); */
+/*         LOG_DEBUG(0, "buf: %s", buf); */
 /*     } */
-/*     TRACE_LOG_DEBUG("tomlx_datetime_to_string returning: %s", buf); */
+/*     LOG_DEBUG(0, "tomlx_datetime_to_string returning: %s", buf); */
 /*     return buf; */
 /* } */
 
@@ -466,7 +479,7 @@ s7_pointer toml_datetime_to_alist(s7_scheme *s7, toml_timestamp_t *ts, bool clon
                               s7_make_keyword(s7, "year"),
                               s7_make_integer(s7, *ts->year));
     s7_list_set(s7, the_alist, (s7_int)0, year);
-    TRACE_S7_DUMP("returning alist", the_alist);
+    TRACE_S7_DUMP(0, "returning alist: %s", the_alist);
     return the_alist;
 }
 
@@ -477,7 +490,7 @@ s7_pointer toml_datetime_to_hash_table(s7_scheme *s7, toml_timestamp_t *ts)
     s7_pointer ht = s7_make_hash_table(s7, 8);
     s7_hash_table_set(s7, ht, s7_make_keyword(s7, "year"),
                       s7_make_integer(s7, *ts->year));
-    TRACE_S7_DUMP("returning hash-table", ht);
+    TRACE_S7_DUMP(0, "returning hash-table: %s", ht);
     return ht;
 }
 
