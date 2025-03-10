@@ -110,7 +110,7 @@ s7_pointer toml_table_keys(s7_scheme *s7, s7_pointer args)
         /* LOG_DEBUG(0, "table key: %s", k); */
         s7_list_set(s7, keys, i, s7_make_string(s7, k));
     }
-    /* TRACE_S7_DUMP(0, "keys: %s", keys); */
+    /* LOG_S7_DEBUG(0, "keys:", keys); */
     return keys;
 }
 
@@ -138,7 +138,7 @@ s7_pointer toml_table_values(s7_scheme *s7, s7_pointer args)
         //FIXME: get value for key
         s7_list_set(s7, keys, i, s7_make_string(s7, k));
     }
-    /* TRACE_S7_DUMP(0, "keys: %s", keys); */
+    /* LOG_S7_DEBUG(0, "keys:", keys); */
     return s7_unspecified(s7);
 }
 
@@ -550,7 +550,7 @@ s7_pointer toml_table_to_hash_table(s7_scheme *s7, toml_table_t *tt, bool clone)
             }
         }
     }
-    TRACE_S7_DUMP(0, "returning ht: %s", the_ht);
+    LOG_S7_DEBUG(0, "returning ht:", the_ht);
     return the_ht;
 }
 

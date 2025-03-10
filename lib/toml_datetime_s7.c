@@ -279,7 +279,7 @@ static s7_pointer g_toml_datetime_to_string(s7_scheme *s7, s7_pointer args)
     p = s7_cdr(p);
     if (p != s7_nil(s7)) {
         arg = s7_car(p);
-        TRACE_S7_DUMP(0, "boolarg: %s", arg);
+        LOG_S7_DEBUG(0, "boolarg: ", arg);
         if (s7_is_boolean(arg)) {
             use_write = s7_boolean(s7, arg);
         } else {
@@ -479,7 +479,7 @@ s7_pointer toml_datetime_to_alist(s7_scheme *s7, toml_timestamp_t *ts, bool clon
                               s7_make_keyword(s7, "year"),
                               s7_make_integer(s7, *ts->year));
     s7_list_set(s7, the_alist, (s7_int)0, year);
-    TRACE_S7_DUMP(0, "returning alist: %s", the_alist);
+    LOG_S7_DEBUG(0, "returning alist: ", the_alist);
     return the_alist;
 }
 
@@ -490,7 +490,7 @@ s7_pointer toml_datetime_to_hash_table(s7_scheme *s7, toml_timestamp_t *ts)
     s7_pointer ht = s7_make_hash_table(s7, 8);
     s7_hash_table_set(s7, ht, s7_make_keyword(s7, "year"),
                       s7_make_integer(s7, *ts->year));
-    TRACE_S7_DUMP(0, "returning hash-table: %s", ht);
+    LOG_S7_DEBUG(0, "returning hash-table: ", ht);
     return ht;
 }
 

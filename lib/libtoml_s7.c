@@ -41,7 +41,7 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
 {
     TRACE_ENTRY;
     s7_pointer p, arg;
-    /* TRACE_S7_DUMP(0, "args: %s", args); */
+    /* LOG_S7_DEBUG(0, "args: ", args); */
 
     /* s7_gc_on(s7, false); */
 
@@ -92,10 +92,10 @@ static s7_pointer g_toml_read(s7_scheme *s7, s7_pointer args)
                         s7_cons(s7, s7_make_string(s7, (char*)errbuff), s7_nil(s7)));
     } else {
         s7_pointer rval = s7_make_c_object(s7, toml_table_type_tag, (void*)t);
-        /* TRACE_S7_DUMP(0, "tt: %s", rval); */
+        /* LOG_S7_DEBUG(0, "tt: ", rval); */
         /* log_debug("returning obj"); */
         /* s7_pointer dt = s7_type_of(s7, rval); */
-        /* TRACE_S7_DUMP(0, "typ: %s", dt); */
+        /* LOG_S7_DEBUG(0, "typ: ", dt); */
         /* log_debug("toml-table? %d", */
         /*           s7_c_object_type(rval) == toml_table_type_tag); */
         /* log_debug("tag: %d", toml_table_type_tag); */
@@ -135,7 +135,7 @@ EXPORT s7_pointer toml_read_file(s7_scheme *s7, char *fname)
         log_debug("returning obj");
         s7_pointer dt = s7_type_of(s7, rval);
         (void)dt;
-        TRACE_S7_DUMP(0, "typ: %s", dt);
+        LOG_S7_DEBUG(0, "typ: ", dt);
         log_debug("toml-table? %d",
                   s7_c_object_type(rval) == toml_table_type_tag);
         log_debug("tag: %d", toml_table_type_tag);

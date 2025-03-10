@@ -436,12 +436,12 @@ void root_array_1(void) {
         "first_name = \"Bruce\"\n"
         "last_name = \"Springsteen\"\n"
                      "");
-    TRACE_S7_DUMP(0, "root: %s", root);
+    LOG_S7_DEBUG(0, "root:", root);
     actual = APPLY_1("toml:map?", root);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
 
     ht = APPLY_1("toml:map->hash-table", root);
-    /* TRACE_S7_DUMP(0, "ht: %s", ht); */
+    /* LOG_S7_DEBUG(0, "ht:", ht); */
     /* b = APPLY_1("hash-table?", ht); */
     TEST_ASSERT_EQUAL(true, s7_is_hash_table(ht));
 
@@ -450,18 +450,18 @@ void root_array_1(void) {
     a = APPLY_2("toml:map-ref", root, k);
     b = APPLY_1("toml:array?", a);
     TEST_ASSERT_EQUAL(s7_t(s7), b);
-    TRACE_S7_DUMP(0, "people: %s", a);
+    LOG_S7_DEBUG(0, "people:", a);
 
     // and from hash-table
     k = s7_make_keyword(s7, "people");
     a = APPLY_2("hash-table-ref", ht, k);
-    TRACE_S7_DUMP(0, "people: %s", a);
+    LOG_S7_DEBUG(0, "people:", a);
     tmp = s7_type_of(s7, a);
-    TRACE_S7_DUMP(0, "typ: %s", tmp);
+    LOG_S7_DEBUG(0, "typ:", tmp);
     TEST_ASSERT_EQUAL(true, s7_is_vector(a));
     /* b = APPLY_1("hash-table?", a); */
     /* TEST_ASSERT_EQUAL(s7_t(s7), b); */
-    TRACE_S7_DUMP(0, "people: %s", a);
+    LOG_S7_DEBUG(0, "people:", a);
 
     /* toml = "a = [[1, 2, [3, 4]], [5, 6]]\""; */
     /* root = TOML_READ(toml); */

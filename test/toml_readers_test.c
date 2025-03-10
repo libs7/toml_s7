@@ -57,7 +57,7 @@ void read_string_port(void) {
     TEST_ASSERT_TRUE(flag_bool);
 
     t = s7_apply_function(s7, toml_read, s7_list(s7, 1, inport));
-    /* TRACE_S7_DUMP(0, "read_string_port: %s", t); */
+    /* LOG_S7_DEBUG(0, "read_string_port:", t); */
     flag = APPLY_1("toml:map?", t);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 }
@@ -66,7 +66,7 @@ void with_input_from_string(void) {
     cmd = ""
     "(with-input-from-string \"t = { i = 1, s = \\\"Hello\\\" }\" toml:read)";
     actual = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP(0, "with-input-from-string: %s", actual);
+    LOG_S7_DEBUG(0, "with-input-from-string:", actual);
     res = APPLY_1("toml:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -75,7 +75,7 @@ void call_with_input_string(void) {
     cmd = ""
     "(call-with-input-string \"t = { i = 1, s = \\\"Hello\\\" }\" toml:read)";
     actual = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP(0, "call-with-input-string: %s", actual);
+    LOG_S7_DEBUG(0, "call-with-input-string:", actual);
     res = APPLY_1("toml:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -124,7 +124,7 @@ void call_with_input_file(void) {
     cmd = ""
     "(call-with-input-file \"test/data/strings.toml\" toml:read)";
     t = s7_eval_c_string(s7, cmd);
-    TRACE_S7_DUMP(0, "t: %s", t);
+    LOG_S7_DEBUG(0, "t:", t);
     actual = APPLY_1("toml:map?", t);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
 

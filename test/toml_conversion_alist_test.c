@@ -119,7 +119,7 @@ void subarray_to_vector(void)
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
 
-    TRACE_S7_DUMP("actual", actual);
+    LOG_S7_DEBUG("actual", actual);
 
     sexp = "(hash-table \"a\" #(1 2 3))";
     /* expected = EVAL(sexp); */

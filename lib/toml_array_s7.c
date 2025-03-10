@@ -96,7 +96,7 @@ s7_pointer toml_array_ref(s7_scheme *s7, s7_pointer args)
 
     p = s7_cdr(p);
     arg = s7_car(p);
-    TRACE_S7_DUMP(0, "arg: %s", arg);
+    LOG_S7_DEBUG(0, "arg: ", arg);
     if (s7_is_integer(arg))
         idx = (int)s7_integer(arg);
     else return(s7_wrong_type_error(s7, s7_make_string_wrapper_with_length(s7, "toml:array-ref", 15), 2, arg, integer_string));
@@ -248,7 +248,7 @@ static s7_pointer g_toml_array_to_string(s7_scheme *s7, s7_pointer args)
     p = s7_cdr(p);
     if (p != s7_nil(s7)) {
         arg = s7_car(p);
-        TRACE_S7_DUMP(0, "boolarg: %s", arg);
+        LOG_S7_DEBUG(0, "boolarg:", arg);
         if (s7_is_boolean(arg)) {
             use_write = s7_boolean(s7, arg);
         } else {
@@ -690,7 +690,7 @@ s7_pointer toml_array_to_list(s7_scheme *s7, toml_array_t *ta, bool clone)
             case TOML_ARRAY:
                 LOG_DEBUG(0, "recurring subarray to list", "");
                 subarray = toml_array_to_list(s7, seq, clone);
-                TRACE_S7_DUMP(0, "recd subarray %s", subarray);
+                LOG_S7_DEBUG(0, "recd subarray ", subarray);
                 s7_list_set(s7, the_list, i, subarray);
                 break;
             case TOML_TABLE:
@@ -740,7 +740,7 @@ s7_pointer toml_array_to_list(s7_scheme *s7, toml_array_t *ta, bool clone)
             }
         }
     }
-    TRACE_S7_DUMP(0, "returning list: %s", the_list);
+    LOG_S7_DEBUG(0, "returning list: ", the_list);
     return the_list;
 }
 
@@ -767,7 +767,7 @@ s7_pointer toml_array_to_vector(s7_scheme *s7, toml_array_t *ta, bool clone)
             case TOML_ARRAY:
                 LOG_DEBUG(0, "recurring subarray to list", "");
                 subarray = toml_array_to_vector(s7, seq, clone);
-                TRACE_S7_DUMP(0, "recd subarray: %s", subarray);
+                LOG_S7_DEBUG(0, "recd subarray: ", subarray);
                 s7_vector_set(s7, the_vector, i, subarray);
                 break;
             case TOML_TABLE:
@@ -824,6 +824,6 @@ s7_pointer toml_array_to_vector(s7_scheme *s7, toml_array_t *ta, bool clone)
             }
         }
     }
-    TRACE_S7_DUMP(0, "returning vector: %s", the_vector);
+    LOG_S7_DEBUG(0, "returning vector: ", the_vector);
     return the_vector;
 }

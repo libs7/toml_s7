@@ -19,12 +19,12 @@ s7_plugin(
     name       = "toml_s7",
     srcs       = ["libtoml_s7.c", ":mkhdrs"],
     hdrs       = [":toml_s7.h"],
+    includes   = ["."],
     deps       = DEPS + [
         ":toml_array",
         ":toml_datetime",
         ":toml_table",
     ],
-    includes = ["."],
     copts = COPTS,
     local_defines = define_module_version(),
     defines = DEFINES,
@@ -84,15 +84,15 @@ makeheaders(
         "toml_table_s7.c"
     ],
     additional_srcs = [
-        "@makeheaders//logging:ansi_colors.h"
+        "@liblogc//macros:ansi_colors.h"
     ] + select({
-        "@makeheaders//compilation_mode:fastbuild": [
-            "@libs7//logging:s7_macros_debug.h",
-            "@makeheaders//logging:macros_debug.h"
+        "@obazl_tools_cc//profile:dev?": [
+            "@libs7//macros:s7_logging_debug.h",
+            "@liblogc//macros:logging_debug.h"
         ],
         "//conditions:default": [
-            "@libs7//logging:s7_macros_ndebug.h",
-            "@makeheaders//logging:macros_ndebug.h"
+            "@libs7//macros:s7_logging_ndebug.h",
+            "@liblogc//macros:logging_ndebug.h"
         ]
     }),
 )
@@ -108,15 +108,15 @@ makeheaders(
         "toml_table_s7.c"
     ],
     additional_srcs = [
-        "@makeheaders//logging:ansi_colors.h"
+        "@liblogc//macros:ansi_colors.h"
     ] + select({
-        "@makeheaders//compilation_mode:fastbuild": [
-            "@libs7//logging:s7_macros_debug.h",
-            "@makeheaders//logging:macros_debug.h"
+        "@obazl_tools_cc//profile:dev?": [
+            "@libs7//macros:s7_logging_debug.h",
+            "@liblogc//macros:logging_debug.h"
         ],
         "//conditions:default": [
-            "@libs7//logging:s7_macros_ndebug.h",
-            "@makeheaders//logging:macros_ndebug.h"
+            "@libs7//macros:s7_logging_ndebug.h",
+            "@liblogc//macros:logging_ndebug.h"
         ]
     }),
 )
