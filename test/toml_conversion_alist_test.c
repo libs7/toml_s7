@@ -14,10 +14,11 @@ s7_scheme *s7;
 extern struct option options[];
 
 s7_pointer flag, t, subt, k, a, suba, idx, ht;
-s7_pointer sexp, expected, actual;
+s7_pointer expected, actual, actual_str;
 s7_pointer res, len, m, tmp;
 
-char *expected_str, *actual_str, *tmp_str;
+char *sexp;
+char *expected_str, *tmp_str;
 char *cmd;
 
 bool verbose;
@@ -26,21 +27,21 @@ bool debug;
 
 #define EVAL(s) s7_eval_c_string(s7, s)
 
-#define TOML_READ(s) \
-    s7_apply_function(s7, s7_name_to_value(s7, "toml:read"),    \
-                      s7_list(s7, 1, s7_eval_c_string(s7, s)));
+/* #define TOML_READ(s) \ */
+/*     s7_apply_function(s7, s7_name_to_value(s7, "toml:read"),    \ */
+/*                       s7_list(s7, 1, s7_eval_c_string(s7, s))); */
 
 #define APPLY_1(f, o) \
  s7_apply_function(s7, s7_name_to_value(s7, f),    \
                        s7_list(s7, 1, o))
 
-#define APPLY_2(f, a, b)                             \
- s7_apply_function(s7, s7_name_to_value(s7, f),    \
-                   s7_list(s7, 2, a, b))
+/* #define APPLY_2(f, a, b)                             \ */
+/*  s7_apply_function(s7, s7_name_to_value(s7, f),    \ */
+/*                    s7_list(s7, 2, a, b)) */
 
-#define APPLY_3(f, a, b, c)                          \
- s7_apply_function(s7, s7_name_to_value(s7, f),    \
-                   s7_list(s7, 3, a, b, c))
+/* #define APPLY_3(f, a, b, c)                          \ */
+/*  s7_apply_function(s7, s7_name_to_value(s7, f),    \ */
+/*                    s7_list(s7, 3, a, b, c)) */
 
     /* s7_apply_function_star(s7, s7_name_to_value(s7, f), \ */
     /*                            s7_list(s7, 1, v)) */
