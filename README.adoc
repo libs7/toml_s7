@@ -6,8 +6,6 @@ link:https://github.com/libs7/libs7[libs7] bindings for
 link:https://github.com/obazl/tomlc[tomlc] (derived from
 link:https://github.com/cktan/tomlc99[tomlc99]).
 
-WARNING: Not ready for general use.
-
 == overview
 
 WARNING: `toml_s7` (like the underlying `tomlc` library) is

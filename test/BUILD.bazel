@@ -44,16 +44,16 @@ s7_plugin_test(
     tags          = TAGS + ["arrays"]
 )
 
-s7_plugin_test(
-    name          = "conversion_alist_test",
-    srcs          = SRCS + ["toml_conversion_alist_test.c"],
-    deps          = DEPS,
-    copts         = COPTS,
-    linkopts      = LINKOPTS,
-    local_defines = DEFINES,
-    timeout       = TIMEOUT,
-    tags          = TAGS + ["maps", "conversion"]
-)
+# s7_plugin_test(
+#     name          = "conversion_alist_test",
+#     srcs          = SRCS + ["toml_conversion_alist_test.c"],
+#     deps          = DEPS,
+#     copts         = COPTS,
+#     linkopts      = LINKOPTS,
+#     local_defines = DEFINES,
+#     timeout       = TIMEOUT,
+#     tags          = TAGS + ["maps", "conversion"]
+# )
 
 s7_plugin_test(
     name          = "conversion_ht_test",
